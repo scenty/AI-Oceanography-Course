@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ChevronDown, BookOpen, Code } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { getImagePath } from '@/lib/utils';
 
 export function Hero() {
   const scrollToSection = (href: string) => {
@@ -19,7 +20,7 @@ export function Hero() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: 'url(/images/hero-bg.jpg)',
+          backgroundImage: `url(${getImagePath('/images/hero-bg.jpg')})`,
         }}
       />
       

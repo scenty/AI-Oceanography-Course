@@ -59,6 +59,23 @@ git push origin main
 
 ## 故障排除
 
+### ❌ HttpError: Not Found 错误
+
+**这是最常见的错误！** 通常是因为 GitHub Pages 没有正确启用。
+
+**解决方法：**
+
+1. **最重要的一步**：进入仓库的 **Settings** > **Pages**
+2. 在 **Source** 部分，**必须选择 `GitHub Actions`**（不要选择 Branch）
+3. 如果显示 "Your site is ready to be published"，说明还没有选择源，请选择 **GitHub Actions**
+4. 保存后，重新运行工作流
+
+**其他可能的原因：**
+
+- 检查 **Settings** > **Actions** > **General** > **Workflow permissions**，确保选择了 **Read and write permissions**
+- 确认您的默认分支名称（main 或 master）与工作流文件中的配置一致
+- 详细故障排除请查看 `TROUBLESHOOTING.md` 文件
+
 ### 如果网站无法正常显示
 
 1. 检查 `vite.config.ts` 中的 `base` 路径是否正确

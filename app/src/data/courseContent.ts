@@ -1,5 +1,12 @@
 // 课程章节详细内容 - 基于PDF课件的二级标题
 
+// 获取正确的图片路径（适配 GitHub Pages 子路径）
+function getImagePath(path: string): string {
+  const base = import.meta.env.BASE_URL
+  const cleanPath = path.startsWith('/') ? path.slice(1) : path
+  return `${base}${cleanPath}`
+}
+
 export interface SectionContent {
   id: string;
   title: string;
@@ -39,7 +46,7 @@ export const courseChapters: Chapter[] = [
           'AI方法已证明其效率和能力，影响和改变很多学科',
           'DeepSeek 7天破亿用户，展示颠覆性增长'
         ],
-        image: '/images/ai-development.png'
+        image: getImagePath('/images/ai-development.png')
       },
       {
         id: 'ch1-2',
@@ -51,7 +58,7 @@ export const courseChapters: Chapter[] = [
           '全球产业格局重构，微软Azure/AWS/英伟达/AMD支持',
           '大语言模型的正确使用：总结知识、编写代码、修改语法'
         ],
-        image: '/images/deepseek.png'
+        image: getImagePath('/images/deepseek.png')
       },
       {
         id: 'ch1-3',
@@ -64,7 +71,7 @@ export const courseChapters: Chapter[] = [
           '模式参数的智能计算：参数化方案优化',
           '智能海洋数值模式开发：AI求解动力方程'
         ],
-        image: '/images/ai-ocean-apps.png'
+        image: getImagePath('/images/ai-ocean-apps.png')
       }
     ]
   },
@@ -86,7 +93,7 @@ export const courseChapters: Chapter[] = [
           '海洋大数据增速40%，超过空天和陆地数据',
           '大数据技术：存储管理、分析挖掘、可视化'
         ],
-        image: '/images/big-data.png'
+        image: getImagePath('/images/big-data.png')
       },
       {
         id: 'ch2-2',
@@ -98,7 +105,7 @@ export const courseChapters: Chapter[] = [
           '大量积累阶段（21世纪）：传感器普及、云计算应用',
           '现代物理海洋学之父：Ekman、Rossby、Sverdrup、Stommel、Munk'
         ],
-        image: '/images/ocean-data-history.png'
+        image: getImagePath('/images/ocean-data-history.png')
       },
       {
         id: 'ch2-3',
@@ -110,7 +117,7 @@ export const courseChapters: Chapter[] = [
           'Variety：水文、气象、地质、生物等多领域数据',
           'Value：海洋资源利用、环境保护、灾害预测'
         ],
-        image: '/images/5v-characteristics.png'
+        image: getImagePath('/images/5v-characteristics.png')
       },
       {
         id: 'ch2-4',
@@ -122,7 +129,7 @@ export const courseChapters: Chapter[] = [
           '日本气象厅平台',
           '国家海洋科学数据中心、科学数据银行'
         ],
-        image: '/images/data-platforms.png'
+        image: getImagePath('/images/data-platforms.png')
       }
     ]
   },
@@ -144,7 +151,7 @@ export const courseChapters: Chapter[] = [
           '半监督/自监督学习、生成对抗网络',
           '机器学习基本流程：训练→验证→测试'
         ],
-        image: '/images/machine-learning.png'
+        image: getImagePath('/images/machine-learning.png')
       },
       {
         id: 'ch3-2',
@@ -210,7 +217,7 @@ def gradient_descent(X, y, theta, alpha, iterations):
           '深度与宽度的概念',
           '万能近似定理：神经网络能拟合任意连续函数'
         ],
-        image: '/images/neural-network-structure.png'
+        image: getImagePath('/images/neural-network-structure.png')
       },
       {
         id: 'ch3-5',
@@ -405,7 +412,7 @@ model = NeuralNetwork()`
           '平移不变性',
           '层次特征提取：像素→边缘→形状→对象'
         ],
-        image: '/images/cnn-convolution.png'
+        image: getImagePath('/images/cnn-convolution.png')
       },
       {
         id: 'ch5-2',
@@ -467,7 +474,7 @@ dropout = nn.Dropout(p=0.5)`
           'ATM机中仍在使用的算法',
           '深度学习三巨头的贡献'
         ],
-        image: '/images/lenet.png'
+        image: getImagePath('/images/lenet.png')
       },
       {
         id: 'ch5-5',
@@ -479,7 +486,7 @@ dropout = nn.Dropout(p=0.5)`
           'Encoder-Decoder结构',
           '长期依赖问题'
         ],
-        image: '/images/rnn-structure.png'
+        image: getImagePath('/images/rnn-structure.png')
       },
       {
         id: 'ch5-6',
@@ -524,7 +531,7 @@ output, (hidden, cell) = lstm(input_seq)`
           '方法：动力诊断 vs 经验性方法',
           'AI优势：学习表层与内部的映射关系'
         ],
-        image: '/images/deep-ocean-remote.png'
+        image: getImagePath('/images/deep-ocean-remote.png')
       },
       {
         id: 'ch6-2',
@@ -536,7 +543,7 @@ output, (hidden, cell) = lstm(input_seq)`
           'Skip Connection：保留空间信息',
           '海洋应用：OHC重建、超分辨率'
         ],
-        image: '/images/unet-architecture.png'
+        image: getImagePath('/images/unet-architecture.png')
       },
       {
         id: 'ch6-3',
@@ -548,7 +555,7 @@ output, (hidden, cell) = lstm(input_seq)`
           '聚类神经网络方法',
           'LSTM时序建模方法'
         ],
-        image: '/images/ohc-reconstruction.png'
+        image: getImagePath('/images/ohc-reconstruction.png')
       },
       {
         id: 'ch6-4',
@@ -560,7 +567,7 @@ output, (hidden, cell) = lstm(input_seq)`
           '集成学习方法',
           'eddy-resolved产品构建'
         ],
-        image: '/images/super-resolution.png'
+        image: getImagePath('/images/super-resolution.png')
       }
     ]
   },
@@ -582,7 +589,7 @@ output, (hidden, cell) = lstm(input_seq)`
           '循环波动（Cyclicity）',
           '不规则波动（Irregularity）'
         ],
-        image: '/images/time-series-components.png'
+        image: getImagePath('/images/time-series-components.png')
       },
       {
         id: 'ch7-2',
@@ -619,7 +626,7 @@ tau = -1 / np.log(alpha)`
           'Encoder-Forecaster架构',
           '应用：降水预测、ENSO预报'
         ],
-        image: '/images/convlstm.png'
+        image: getImagePath('/images/convlstm.png')
       }
     ]
   },
@@ -641,7 +648,7 @@ tau = -1 / np.log(alpha)`
           'Softmax归一化权重',
           '加权聚合Value'
         ],
-        image: '/images/attention-mechanism.png'
+        image: getImagePath('/images/attention-mechanism.png')
       },
       {
         id: 'ch8-2',
@@ -682,7 +689,7 @@ output = attn_weights @ V`
           'Feed-Forward Networks',
           'Layer Normalization'
         ],
-        image: '/images/transformer.png'
+        image: getImagePath('/images/transformer.png')
       },
       {
         id: 'ch8-4',
@@ -694,7 +701,7 @@ output = attn_weights @ V`
           '位置编码',
           '海洋波浪预测应用'
         ],
-        image: '/images/vit.png'
+        image: getImagePath('/images/vit.png')
       }
     ]
   },
@@ -716,7 +723,7 @@ output = attn_weights @ V`
           '交并比（IoU）',
           '非极大值抑制（NMS）'
         ],
-        image: '/images/object-detection.png'
+        image: getImagePath('/images/object-detection.png')
       },
       {
         id: 'ch9-2',
@@ -728,7 +735,7 @@ output = attn_weights @ V`
           'Faster R-CNN：RPN网络',
           'Mask R-CNN：实例分割'
         ],
-        image: '/images/rcnn.png'
+        image: getImagePath('/images/rcnn.png')
       },
       {
         id: 'ch9-3',
@@ -740,7 +747,7 @@ output = attn_weights @ V`
           '多尺度特征检测',
           '海洋应用场景'
         ],
-        image: '/images/yolo.png'
+        image: getImagePath('/images/yolo.png')
       },
       {
         id: 'ch9-4',
@@ -752,7 +759,7 @@ output = attn_weights @ V`
           '深度学习方法：U-Net分割',
           'PSPNet、DeepLabV3+应用'
         ],
-        image: '/images/eddy-detection.png'
+        image: getImagePath('/images/eddy-detection.png')
       }
     ]
   },
@@ -774,7 +781,7 @@ output = attn_weights @ V`
           'PINN优势：计算快速、物理一致性',
           '适用于不规则边界和复杂几何'
         ],
-        image: '/images/pinn-concept.png'
+        image: getImagePath('/images/pinn-concept.png')
       },
       {
         id: 'ch10-2',
@@ -840,7 +847,7 @@ loss = J_data + weight_phys * J_phys`
           'PINN对噪声更鲁棒',
           '物理一致性保证'
         ],
-        image: '/images/pinn-vs-nn.png'
+        image: getImagePath('/images/pinn-vs-nn.png')
       }
     ]
   }
