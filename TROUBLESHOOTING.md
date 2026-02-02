@@ -88,3 +88,5 @@ ls -la dist
 2. 确认仓库名称和路径配置是否正确
 3. 尝试使用 GitHub CLI 或手动上传 dist 文件夹到 gh-pages 分支（传统方法）
 
+
+

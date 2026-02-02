@@ -1,4 +1,3 @@
-import { ParticleBackground } from '@/components/ParticleBackground';
 import { Navbar } from '@/components/Navbar';
 import { Hero } from '@/sections/Hero';
 import { About } from '@/sections/About';
@@ -11,9 +10,6 @@ import { Footer } from '@/sections/Footer';
 function App() {
   return (
     <div className="relative min-h-screen bg-[#020617]">
-      {/* Particle Background */}
-      <ParticleBackground />
-      
       {/* Navigation */}
       <Navbar />
       

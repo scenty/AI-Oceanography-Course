@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { ChevronDown, BookOpen, Code } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getImagePath } from '@/lib/utils';
+import { ParticleBackground } from '@/components/ParticleBackground';
 
 export function Hero() {
   const scrollToSection = (href: string) => {
@@ -18,17 +19,22 @@ export function Hero() {
     >
       {/* Background Image */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
         style={{
           backgroundImage: `url(${getImagePath('/images/hero-bg.jpg')})`,
         }}
       />
       
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/60 via-[#020617]/40 to-[#020617]" />
+      {/* Gradient Overlay - 降低透明度让气泡更明显 */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#020617]/40 via-[#020617]/30 to-[#020617]/80 z-[1]" />
       
       {/* Radial Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(59,130,246,0.15),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(59,130,246,0.15),transparent_50%)] z-[2]" />
+
+      {/* Particle Background - 放在 Hero 内部以确保正确的堆叠顺序 */}
+      <div className="absolute inset-0 z-[5] overflow-hidden">
+        <ParticleBackground />
+      </div>
 
       {/* Content */}
       <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

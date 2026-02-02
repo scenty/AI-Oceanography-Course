@@ -23,26 +23,43 @@ export function ParticleBackground() {
     if (!ctx) return;
 
     const resizeCanvas = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      // 使用父容器的大小，如果父容器不存在则使用 window
+      const parent = canvas.parentElement;
+      if (parent) {
+        canvas.width = parent.clientWidth;
+        canvas.height = parent.clientHeight;
+      } else {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
     };
 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Initialize particles
-    const particleCount = 60;
-    particlesRef.current = Array.from({ length: particleCount }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * 0.5,
-      vy: (Math.random() - 0.5) * 0.5,
-      radius: Math.random() * 2 + 1,
-      opacity: Math.random() * 0.5 + 0.2,
-    }));
+    // Initialize particles after first resize
+    const initParticles = () => {
+      const particleCount = 60;
+      particlesRef.current = Array.from({ length: particleCount }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        radius: Math.random() * 2 + 1.5,
+        opacity: Math.random() * 0.4 + 0.6,
+      }));
+    };
+    
+    resizeCanvas();
+    initParticles();
 
     const handleMouseMove = (e: MouseEvent) => {
-      mouseRef.current = { x: e.clientX, y: e.clientY };
+      // 获取 canvas 相对于页面的位置
+      const rect = canvas.getBoundingClientRect();
+      mouseRef.current = { 
+        x: e.clientX - rect.left, 
+        y: e.clientY - rect.top 
+      };
     };
     window.addEventListener('mousemove', handleMouseMove);
 
@@ -53,7 +70,7 @@ export function ParticleBackground() {
       const mouse = mouseRef.current;
 
       // Update and draw particles
-      particles.forEach((particle, i) => {
+      particles.forEach((particle) => {
         // Mouse interaction - gentle repulsion
         const dx = mouse.x - particle.x;
         const dy = mouse.y - particle.y;
@@ -78,27 +95,15 @@ export function ParticleBackground() {
         particle.vx *= 0.99;
         particle.vy *= 0.99;
 
-        // Draw particle
+        // Draw particle with glow effect
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(59, 130, 246, ${particle.opacity})`;
+        // 使用更亮的青色，增加可见度
+        ctx.fillStyle = `rgba(6, 182, 212, ${particle.opacity})`;
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = 'rgba(6, 182, 212, 0.8)';
         ctx.fill();
-
-        // Draw connections
-        particles.slice(i + 1).forEach((other) => {
-          const dx = particle.x - other.x;
-          const dy = particle.y - other.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 120) {
-            ctx.beginPath();
-            ctx.moveTo(particle.x, particle.y);
-            ctx.lineTo(other.x, other.y);
-            ctx.strokeStyle = `rgba(59, 130, 246, ${0.15 * (1 - distance / 120)})`;
-            ctx.lineWidth = 0.5;
-            ctx.stroke();
-          }
-        });
+        ctx.shadowBlur = 0;
       });
 
       animationRef.current = requestAnimationFrame(animate);
@@ -118,7 +123,7 @@ export function ParticleBackground() {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0"
+      className="absolute inset-0 w-full h-full pointer-events-none"
       style={{ background: 'transparent' }}
     />
   );

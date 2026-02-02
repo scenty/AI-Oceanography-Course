@@ -1,0 +1,10 @@
+Host oceanography-server
+    HostName 172.27.127.234
+    Port 7858
+    User wml692
+    # 可选配置项：
+    # IdentityFile ~/.ssh/id_rsa
+    # ServerAliveInterval 60
+    # ServerAliveCountMax 3
+
+
