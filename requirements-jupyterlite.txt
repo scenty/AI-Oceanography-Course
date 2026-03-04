@@ -1,0 +1,5 @@
+# 用于在 CI 中构建 JupyterLite（将 public/notebook 打包进默认路径）
+# 仅构建用，无需安装到主项目
+jupyterlite-core>=0.7.0
+jupyterlite-pyodide-kernel>=0.7.0
+jupyterlab>=4.0,<5

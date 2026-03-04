@@ -29,6 +29,17 @@ jobs:
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
+      - name: Setup Python (for JupyterLite)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build JupyterLite (notebook 预置到默认路径)
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements-jupyterlite.txt
+          jupyter lite build --contents public/notebook --output-dir public/jupyterlite
+
       - name: Install dependencies
         run: npm ci
 

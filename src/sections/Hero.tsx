@@ -44,7 +44,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.2, ease: [0.165, 0.84, 0.44, 1] }}
         >
           <span className="inline-block px-4 py-1.5 mb-6 text-sm font-medium text-cyan-400 bg-cyan-400/10 border border-cyan-400/20 rounded-full">
-            2024-2025学年 春季学期
+            2025-2026学年 春季学期
           </span>
         </motion.div>
 
@@ -83,7 +83,7 @@ export function Hero() {
           transition={{ duration: 0.8, delay: 0.6, ease: [0.165, 0.84, 0.44, 1] }}
           className="text-slate-400 mb-10 max-w-2xl mx-auto"
         >
-          授课教师：卢文芳 副教授 · 海洋科学学院
+          任课老师：卢文芳 副教授
         </motion.p>
 
         <motion.div

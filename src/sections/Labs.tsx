@@ -249,7 +249,9 @@ export function Labs() {
                         <div className="rounded-xl overflow-hidden border border-slate-700 bg-slate-900/50">
                           <iframe
                             title="JupyterLite 在线 Notebook"
-                            src="https://jupyterlite.github.io/demo/lab/index.html?theme=JupyterLab%20Dark"
+                            src={import.meta.env.DEV
+                              ? 'https://jupyterlite.github.io/demo/lab/index.html?theme=JupyterLab%20Dark'
+                              : `${import.meta.env.BASE_URL}jupyterlite/lab/index.html`}
                             className="w-full border-0"
                             style={{ height: 'min(72vh, 680px)' }}
                             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
@@ -257,9 +259,9 @@ export function Labs() {
                           />
                         </div>
                         <p className="text-xs text-slate-500">
-                          首次加载会下载 Python 运行环境（约数十秒）。可在 Lab 中通过 File → New → Notebook 新建笔记本练习，或通过 File → Open 上传本页提供的
-                          <a href={`${import.meta.env.BASE_URL}notebook/Student_Notebook.ipynb`} download="Student_Notebook.ipynb" className="text-cyan-400 hover:underline">Student_Notebook.ipynb</a>
-                          直接打开完整练习。
+                          {import.meta.env.DEV
+                            ? '本地开发使用官方 Demo；部署后将使用本站自建 JupyterLite，Notebook 已预置在左侧文件树 files 中，打开 Student_Notebook.ipynb 即可练习，无需上传。'
+                            : '首次加载会下载 Python 运行环境（约数十秒）。Notebook 已预置在左侧文件树中，打开 files → Student_Notebook.ipynb 即可直接练习，无需上传。'}
                         </p>
                       </motion.div>
                     )}
