@@ -58,7 +58,7 @@ export function Labs() {
           
           <ScrollReveal delay={0.2}>
             <p className="text-slate-400 max-w-2xl mx-auto">
-              从Python基础到深度学习应用，通过15个编程练习逐步掌握人工智能海洋学的核心技能
+              从基础练习到深度学习应用，通过编程练习逐步掌握人工智能海洋学的核心技能
             </p>
           </ScrollReveal>
         </div>
@@ -156,45 +156,75 @@ export function Labs() {
                                     className="overflow-hidden"
                                   >
                                     <div className="pt-4 border-t border-slate-800">
-                                      {lab.codeTemplate && (
-                                        <div className="mb-4">
-                                          <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
-                                            <Code className="w-3 h-3" />
-                                            <span>代码模板</span>
-                                          </div>
-                                          <pre className="text-xs text-slate-400 bg-slate-900/80 p-4 rounded-lg overflow-x-auto font-mono leading-relaxed">
-                                            <code>{lab.codeTemplate}</code>
-                                          </pre>
-                                        </div>
-                                      )}
+                                      {lab.hidden ? (
+                                        <p className="text-slate-500 text-sm">（内容暂不开放）</p>
+                                      ) : (
+                                        <>
+                                          {lab.codeTemplate && (
+                                            <div className="mb-4">
+                                              <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
+                                                <Code className="w-3 h-3" />
+                                                <span>代码模板</span>
+                                              </div>
+                                              <pre className="text-xs text-slate-400 bg-slate-900/80 p-4 rounded-lg overflow-x-auto font-mono leading-relaxed max-h-80 overflow-y-auto">
+                                                <code>{lab.codeTemplate}</code>
+                                              </pre>
+                                            </div>
+                                          )}
 
-                                      {lab.hints && (
-                                        <div>
-                                          <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
-                                            <Lightbulb className="w-3 h-3" />
-                                            <span>提示</span>
-                                          </div>
-                                          <ul className="space-y-1">
-                                            {lab.hints.map((hint, i) => (
-                                              <li key={i} className="text-sm text-slate-400 flex items-start gap-2">
-                                                <span className="text-cyan-500">•</span>
-                                                {hint}
-                                              </li>
-                                            ))}
-                                          </ul>
-                                        </div>
-                                      )}
+                                          {lab.hints && (
+                                            <div>
+                                              <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
+                                                <Lightbulb className="w-3 h-3" />
+                                                <span>提示</span>
+                                              </div>
+                                              <ul className="space-y-1">
+                                                {lab.hints.map((hint, i) => (
+                                                  <li key={i} className="text-sm text-slate-400 flex items-start gap-2">
+                                                    <span className="text-cyan-500">•</span>
+                                                    {hint}
+                                                  </li>
+                                                ))}
+                                              </ul>
+                                            </div>
+                                          )}
 
-                                      <div className="mt-4 flex gap-2">
-                                        <button className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg text-sm hover:bg-cyan-500/30 transition-colors">
-                                          <Play className="w-4 h-4" />
-                                          运行代码
-                                        </button>
-                                        <button className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm hover:bg-slate-700 transition-colors">
-                                          <FileCode className="w-4 h-4" />
-                                          查看完整代码
-                                        </button>
-                                      </div>
+                                          {lab.id === 'L1' && (
+                                            <p className="mt-3 text-xs text-cyan-400/90">
+                                              下方已嵌入 JupyterLite，可直接在浏览器中运行练习。也可
+                                              <a
+                                                href={`${import.meta.env.BASE_URL}notebook/Student_Notebook.ipynb`}
+                                                download="Student_Notebook.ipynb"
+                                                className="underline hover:text-cyan-300"
+                                              >
+                                                下载练习 Notebook
+                                              </a>
+                                              后上传到 JupyterLite（File → Open）打开。
+                                            </p>
+                                          )}
+
+                                          <div className="mt-4 flex flex-wrap gap-2">
+                                            {lab.id === 'L1' && (
+                                              <a
+                                                href={`${import.meta.env.BASE_URL}notebook/Student_Notebook.ipynb`}
+                                                download="Student_Notebook.ipynb"
+                                                className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm hover:bg-slate-700 transition-colors no-underline"
+                                              >
+                                                <FileCode className="w-4 h-4" />
+                                                下载 Notebook
+                                              </a>
+                                            )}
+                                            <button className="flex items-center gap-2 px-4 py-2 bg-cyan-500/20 text-cyan-400 rounded-lg text-sm hover:bg-cyan-500/30 transition-colors">
+                                              <Play className="w-4 h-4" />
+                                              运行代码
+                                            </button>
+                                            <button className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm hover:bg-slate-700 transition-colors">
+                                              <FileCode className="w-4 h-4" />
+                                              查看完整代码
+                                            </button>
+                                          </div>
+                                        </>
+                                      )}
                                     </div>
                                   </motion.div>
                                 )}
@@ -204,6 +234,35 @@ export function Labs() {
                         </motion.div>
                       ))}
                     </div>
+
+                    {/* 基础练习：L1 展开时全宽嵌入 JupyterLite */}
+                    {category.id === '基础练习' && expandedLab === 'L1' && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 12 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-8 w-full space-y-3"
+                      >
+                        <div className="flex items-center gap-2 text-sm text-cyan-400">
+                          <Play className="w-4 h-4 flex-shrink-0" />
+                          <span>在 JupyterLite 中在线运行（无需安装，浏览器内执行 Python / Notebook）</span>
+                        </div>
+                        <div className="rounded-xl overflow-hidden border border-slate-700 bg-slate-900/50">
+                          <iframe
+                            title="JupyterLite 在线 Notebook"
+                            src="https://jupyterlite.github.io/demo/lab/index.html?theme=JupyterLab%20Dark"
+                            className="w-full border-0"
+                            style={{ height: 'min(72vh, 680px)' }}
+                            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
+                            allowFullScreen
+                          />
+                        </div>
+                        <p className="text-xs text-slate-500">
+                          首次加载会下载 Python 运行环境（约数十秒）。可在 Lab 中通过 File → New → Notebook 新建笔记本练习，或通过 File → Open 上传本页提供的
+                          <a href={`${import.meta.env.BASE_URL}notebook/Student_Notebook.ipynb`} download="Student_Notebook.ipynb" className="text-cyan-400 hover:underline">Student_Notebook.ipynb</a>
+                          直接打开完整练习。
+                        </p>
+                      </motion.div>
+                    )}
                   </motion.div>
                 </TabsContent>
               );

@@ -104,8 +104,8 @@ export function CourseContent() {
                           className="h-full bg-[#0f172a]/80 border-slate-800 hover:border-blue-500/50 transition-all duration-300 overflow-hidden group"
                         >
                           <CardContent className="p-0">
-                            {/* Image Section */}
-                            {section.image && (
+                            {/* Image Section - 仅非隐去时展示 */}
+                            {!chapter.contentHidden && section.image && (
                               <div className="relative h-48 overflow-hidden">
                                 <img
                                   src={section.image}
@@ -119,9 +119,9 @@ export function CourseContent() {
                             {/* Content Section */}
                             <div className="p-6">
                               <div className="flex items-center gap-2 mb-3">
-                                {section.image ? (
+                                {!chapter.contentHidden && section.image ? (
                                   <ImageIcon className="w-4 h-4 text-blue-400" />
-                                ) : section.codeExample ? (
+                                ) : !chapter.contentHidden && section.codeExample ? (
                                   <Code className="w-4 h-4 text-cyan-400" />
                                 ) : (
                                   <BookOpen className="w-4 h-4 text-purple-400" />
@@ -129,6 +129,8 @@ export function CourseContent() {
                                 <h4 className="text-white font-semibold">{section.title}</h4>
                               </div>
                               
+                              {!chapter.contentHidden && (
+                                <>
                               <p className="text-slate-400 text-sm leading-relaxed mb-4">
                                 {section.description}
                               </p>
@@ -160,6 +162,8 @@ export function CourseContent() {
                                     <code>{section.codeExample.slice(0, 200)}...</code>
                                   </pre>
                                 </div>
+                              )}
+                                </>
                               )}
                             </div>
                           </CardContent>

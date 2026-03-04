@@ -25,6 +25,8 @@ export interface Chapter {
   hours: number;
   type: 'theory' | 'practice';
   sections: SectionContent[];
+  /** 为 true 时仅展示章节与小节标题，不展示详细内容 */
+  contentHidden?: boolean;
 }
 
 export const courseChapters: Chapter[] = [
@@ -75,6 +77,7 @@ export const courseChapters: Chapter[] = [
       }
     ]
   },
+  // 第二章及之后：保留标题，隐去内容
   {
     id: 'ch2',
     title: '海洋大数据简介',
@@ -82,6 +85,7 @@ export const courseChapters: Chapter[] = [
     description: '大数据概况、海洋数据发展历程、数据来源与特征、常用数据平台',
     hours: 1,
     type: 'theory',
+    contentHidden: true,
     sections: [
       {
         id: 'ch2-1',
@@ -140,6 +144,7 @@ export const courseChapters: Chapter[] = [
     description: '机器学习基础、梯度下降算法、神经网络结构与反向传播',
     hours: 6,
     type: 'theory',
+    contentHidden: true,
     sections: [
       {
         id: 'ch3-1',
@@ -284,6 +289,7 @@ W2 = W2 - alpha * dW2`
     description: 'Tensor操作、自动微分、数据加载、模型构建与训练',
     hours: 1,
     type: 'practice',
+    contentHidden: true,
     sections: [
       {
         id: 'ch4-1',
@@ -401,6 +407,7 @@ model = NeuralNetwork()`
     description: '卷积神经网络CNN、循环神经网络RNN、注意力机制',
     hours: 5,
     type: 'theory',
+    contentHidden: true,
     sections: [
       {
         id: 'ch5-1',
@@ -520,6 +527,7 @@ output, (hidden, cell) = lstm(input_seq)`
     description: '深海遥感、U-Net网络、热含量重建、超分辨率重建',
     hours: 2,
     type: 'theory',
+    contentHidden: true,
     sections: [
       {
         id: 'ch6-1',
@@ -578,6 +586,7 @@ output, (hidden, cell) = lstm(input_seq)`
     description: '时间序列预测、LSTM应用、ConvLSTM、时空预测',
     hours: 1,
     type: 'theory',
+    contentHidden: true,
     sections: [
       {
         id: 'ch7-1',
@@ -637,6 +646,7 @@ tau = -1 / np.log(alpha)`
     description: 'Transformer架构、自注意力机制、时空注意力、波浪预测',
     hours: 1,
     type: 'theory',
+    contentHidden: true,
     sections: [
       {
         id: 'ch8-1',
@@ -712,6 +722,7 @@ output = attn_weights @ V`
     description: '目标检测、语义分割、涡旋识别、R-CNN与YOLO',
     hours: 1,
     type: 'theory',
+    contentHidden: true,
     sections: [
       {
         id: 'ch9-1',
@@ -770,6 +781,7 @@ output = attn_weights @ V`
     description: 'PINN将物理方程嵌入神经网络，提高模型的物理一致性',
     hours: 1,
     type: 'theory',
+    contentHidden: true,
     sections: [
       {
         id: 'ch10-1',
@@ -863,398 +875,322 @@ export interface LabExercise {
   topics: string[];
   codeTemplate?: string;
   hints?: string[];
+  /** 为 true 时仅展示标题，不展示描述与代码模板 */
+  hidden?: boolean;
 }
 
+// 基础练习：来自 Student_Notebook.ipynb（AI 海洋学课前热身 50 Quizzes）
+const notebookBasicTemplate = `# AI 海洋学：课前热身编程练习 (50 Quizzes)
+# 本练习旨在帮助你快速复习 Python、NumPy 和 Matplotlib 的核心操作，
+# 并掌握向量化编程思维，为后续运用深度学习模型处理复杂的海洋与气候数据打下基础。
+# 请在带有 # TODO: 的注释下方编写你的代码。
+
+## 单元一：Python 基本操作 (Quiz 1 - 10)
+# 本单元复习基础的数据结构、循环控制与函数封装。
+
+# Quiz 1: 打印一条欢迎信息："欢迎来到 AI 海洋学课程！"
+# TODO:
+
+# Quiz 2: 创建一个包含三个测站名称的列表，命名为 stations，元素为 'St_A', 'St_B', 'St_C'。
+# TODO:
+
+# Quiz 3: 将"嘉庚"号（'Jiageng'）作为移动测站，追加到 stations 列表的末尾。
+# TODO:
+
+# Quiz 4: 创建一个字典 station_coords，键为测站名 'St_A' 和 'St_B'，值为包含经纬度的元组，例如 (113.5, 22.1) 和 (114.0, 21.8) (珠江口附近坐标)。
+# TODO:
+
+# Quiz 5: 从字典 station_coords 中提取 'St_A' 的坐标并打印。
+# TODO:
+
+# Quiz 6: 使用 for 循环遍历 stations 列表，打印每个测站的名称。
+# TODO:
+
+# Quiz 7: 编写一个函数 celsius_to_kelvin(c)，将摄氏度转换为开尔文温度 (K = C + 273.15)。
+# TODO:
+
+# Quiz 8: 定义一个包含三个海表温度(SST)的列表 sst_c = [24.5, 28.1, 15.0]，使用 for 循环和上一步的函数，将其全部转换为开尔文并存入新列表 sst_k。
+# TODO:
+
+# Quiz 9: 使用列表推导式 (List Comprehension)，从 sst_c 中筛选出大于 25°C 的温度值。
+# TODO:
+
+# Quiz 10: 使用 f-string 格式化字符串，打印输出："测站 St_A 的当前水温为 24.5 °C"。
+# TODO:
+
+## 单元二：NumPy 基础操作 (Quiz 11 - 25)
+# 本单元重点在于多维数组的创建、索引、切片及基本运算。
+
+# Quiz 11: 导入 numpy 库，并简写为 np。
+# TODO:
+
+# Quiz 12: 创建一个包含 5 个不同深度盐度值 (如 33.1, 33.5, 34.0, 34.2, 34.5) 的 1D NumPy 数组 salinity。
+# TODO:
+
+# Quiz 13: 创建一个 3x3 的 2D NumPy 数组 sst_grid，模拟一小块海域的网格化海表温度。
+# TODO:
+
+# Quiz 14: 创建一个 10x10 的全 0 数组 depth_mask，数据类型指定为 float32。
+# TODO:
+
+# Quiz 15: 创建一个 5x5 的全 1 数组 land_mask，数据类型指定为 int8。
+# TODO:
+
+# Quiz 16: 使用 np.arange 创建一个水深序列 depths，从 0 开始，到 1000 结束（不包含1000），步长为 50。
+# TODO:
+
+# Quiz 17: 使用 np.linspace 创建一个纬度序列 lats，在 10 到 20 之间均匀分布 50 个点。
+# TODO:
+
+# Quiz 18: 打印 sst_grid 数组的维度(ndim)、形状(shape)和元素总数(size)。
+# TODO:
+
+# Quiz 19: 假设有一个包含 12 个月平均温度的 1D 数组 (长度为12)，请将其 reshape 为 3x4 的数组（代表3个季度，每个季度4个月）。
+# temp_12 = np.arange(15, 27)
+# TODO:
+
+# Quiz 20: 索引：提取 salinity 数组中的第 3 个元素（注意索引从0开始）。
+# TODO:
+
+# Quiz 21: 索引：提取 sst_grid 数组中心位置 (第2行，第2列) 的元素。
+# TODO:
+
+# Quiz 22: 切片：提取 salinity 数组的前 3 个元素。
+# TODO:
+
+# Quiz 23: 切片：提取 sst_grid 数组的第 1 列所有数据。
+# TODO:
+
+# Quiz 24: 标量运算：假设全球变暖导致温度上升 1.5 度，给 sst_grid 中的每个元素都加上 1.5，结果存入 sst_warmed。
+# TODO:
+
+# Quiz 25: 数组运算：计算 sst_warmed 与原始 sst_grid 之间的温差（温度异常计算基础）。
+# TODO:
+
+## 单元三：其他工具（Matplotlib）基础操作 (Quiz 26 - 35)
+# 本单元复习科学可视化的基础，特别是温盐图、剖面图和空间网格的绘制。
+
+# Quiz 26: 导入 matplotlib.pyplot 并简写为 plt。
+# TODO:
+
+# 准备绘图数据
+# depths_plot = np.array([0, 50, 100, 200, 500, 1000])
+# temps_plot = np.array([25.0, 24.5, 22.0, 18.0, 10.0, 4.0])
+
+# Quiz 27: 绘制一个简单的折线图，x 轴为温度，y 轴为深度（模拟海洋温度垂直剖面）。
+# TODO:
+
+# Quiz 28: 为上述图表添加标题："Temperature Depth Profile"。
+# TODO:
+
+# Quiz 29: 为 x 轴添加标签 "Temperature (C)"，为 y 轴添加标签 "Depth (m)"。
+# TODO:
+
+# Quiz 30: 在海洋学中，深度通常向下增加。请将 y 轴反转 (提示: gca().invert_yaxis())，最后调用 plt.show() 显示图像。
+# TODO:
+
+# 准备温盐散点数据
+# T = np.random.uniform(10, 30, 50)
+# S = np.random.uniform(33, 35, 50)
+
+# Quiz 31: 绘制温度(T)和盐度(S)的散点图 (T-S Diagram)，x轴为盐度，y轴为温度。
+# TODO:
+
+# Quiz 32: 绘制一组随机生成的海表高度异常(SLA)数据的直方图，设置 bins=20。
+# sla_data = np.random.randn(1000) * 0.1
+# TODO:
+
+# 准备 2D 网格数据
+# sst_field = np.random.rand(20, 20) * 10 + 20
+
+# Quiz 33: 使用 plt.imshow() 将 2D 数组 sst_field 绘制为热力图 (伪彩色图)，设置 colormap 为 'coolwarm'。
+# TODO:
+
+# Quiz 34: 为上一步的热力图添加颜色条 (Colorbar)，并标明单位 "SST (°C)"。
+# TODO:
+
+# Quiz 35: 将绘制好的热力图保存为当前目录下的高清图片文件 'sst_spatial_map.png'，设置 dpi=300。
+# TODO:
+
+## 单元四：NumPy 矢量化进阶操作 (Quiz 36 - 50)
+# 抛弃 for 循环，使用 NumPy 提供的矢量化操作来高效处理大规模矩阵。
+
+# 生成测试数据：模拟 100x100 的海表温度场 (含部分极端值和缺失值)
+# sst_large = np.random.normal(loc=25, scale=3, size=(100, 100))
+# sst_large[10:15, 10:15] = np.nan  # 模拟云遮挡导致的缺失数据
+
+# Quiz 36: 计算 sst_large 数组的全局均值（暂不处理 NaN）。你会发现结果是 nan。
+# TODO:
+
+# Quiz 37: 计算 sst_large 中非 NaN 部分的全局均值。(提示：使用 np.nanmean)
+# TODO:
+
+# Quiz 38: 找出整个温度场中的最大值和最小值 (同样需要忽略 NaN)。
+# TODO:
+
+# Quiz 39: 计算整个温度场的标准差，以评估空间温度的离散程度。
+# TODO:
+
+# Quiz 40: 降维聚合：计算每一列的平均值（模拟纬向平均 Zonal Mean），返回一个长度为 100 的 1D 数组。
+# TODO:
+
+# Quiz 41: 布尔掩码 (Boolean Masking)：创建一个掩码矩阵 is_heatwave，判断 sst_large 中哪些像素的温度大于 30°C。
+# TODO:
+
+# Quiz 42: 使用掩码提取出所有发生热浪 (>30°C) 的具体温度值，结果将是一个 1D 数组。
+# TODO:
+
+# Quiz 43: 条件替换 (np.where)：将 sst_large 中所有小于 20°C 的值替换为 0，大于等于 20°C 的保留原值。
+# TODO:
+
+# 准备广播机制 (Broadcasting) 数据
+# daily_sst = np.random.rand(30, 50, 50) * 5 + 20   # 30天，50x50的空间网格
+# clim_mean = np.random.rand(50, 50) + 22           # 气候态平均矩阵，50x50
+
+# Quiz 44: 广播机制：在不使用 for 循环的情况下，计算每一天、每个格点的温度距平 (Anomaly)，即从 daily_sst 中减去 clim_mean。
+# TODO:
+
+# Quiz 45: 统计运算：计算上一步算出的三维距平矩阵中，有多少个网格点的距平值大于 2.0 °C。(提示：(条件).sum())
+# TODO:
+
+# Quiz 46: 梯度计算：使用 np.gradient 计算 2D 温度场 clim_mean 在 x 和 y 方向的梯度（模拟寻找海洋锋面）。
+# TODO:
+
+# Quiz 47: 缺失值识别：找出一个布尔数组，标明 sst_large 中哪些位置是 NaN (缺失观测)。
+# TODO:
+
+# Quiz 48: 缺失值填充：将 sst_large 中的所有 NaN 替换为该矩阵的有效全局均值 (第37题的结果)。(提示：可以将掩码和索引结合使用，或者使用 np.nan_to_num)
+# TODO:
+
+# Quiz 49: 矩阵乘法：提取 clim_mean 的前 3x3 子矩阵 A，与自身转置 A.T 进行点乘操作 (Dot Product)。这是神经网络中线性层的基础运算。
+# TODO:
+
+# Quiz 50: 高级索引 (Fancy Indexing)：假设你有几个特定浮标的坐标索引 lats_idx = [5, 12, 45]，lons_idx = [10, 20, 30]，请从 clim_mean 中一次性提取这三个离散位置的温度值。
+# TODO:
+
+# 恭喜完成！`;
+
 export const labExercises: LabExercise[] = [
-  // 基础练习
+  // 基础练习（对应 Student_Notebook.ipynb 课前热身 50 Quizzes）
   {
-    id: 'L1.0',
-    title: 'Python基本操作',
-    description: 'Python基础语法、数据类型、列表、字典等基本操作',
+    id: 'L1',
+    title: '课前热身编程练习 (50 Quizzes)',
+    description: '复习 Python、NumPy、Matplotlib 核心操作，掌握向量化编程思维，为后续深度学习处理海洋与气候数据打基础。',
     difficulty: 'beginner',
     category: '基础练习',
-    topics: ['变量', '数据类型', '列表', '字典'],
-    codeTemplate: `# Python基本操作练习
-
-# 1. 基本数据类型
-a = 1           # 整数
-b = 2.0         # 浮点数
-c = complex(3, 2)  # 复数
-d = 'Hello'     # 字符串
-
-# 2. 列表操作
-my_list = [1, 2, 3, 4, 5]
-# TODO: 完成列表的增删改查操作
-
-# 3. 字典操作
-my_dict = {'name': 'AI', 'course': 'Oceanography'}
-# TODO: 完成字典的增删改查操作`
+    topics: ['Python 基本操作', 'NumPy 基础与进阶', 'Matplotlib 可视化', '向量化编程'],
+    codeTemplate: notebookBasicTemplate,
+    hints: [
+      '在带有 # TODO: 的注释下方编写代码',
+      '单元一：列表、字典、循环、函数、列表推导、f-string',
+      '单元二：np.array、arange、linspace、索引切片、reshape、标量/数组运算',
+      '单元三：plt 折线图、散点图、直方图、imshow、colorbar、invert_yaxis、savefig',
+      '单元四：nanmean、布尔掩码、np.where、广播、np.gradient、np.nan_to_num、矩阵乘法、高级索引'
+    ]
   },
-  {
-    id: 'L1.1',
-    title: 'NumPy基础练习',
-    description: 'NumPy数组创建、切片、统计操作、矩阵运算',
-    difficulty: 'beginner',
-    category: '基础练习',
-    topics: ['ndarray', '切片', '统计', '矩阵运算'],
-    codeTemplate: `import numpy as np
-
-# 1. 创建数组
-arr = np.arange(10)
-arr2d = np.array([[1, 2, 3], [4, 5, 6]])
-
-# 2. 数组属性
-print(arr.shape, arr.dtype, arr.ndim)
-
-# 3. 切片操作
-# TODO: 对arr2d进行多种切片操作
-
-# 4. 统计操作
-# TODO: 计算mean, std, max, min`
-  },
-  {
-    id: 'L1.2',
-    title: '其他工具基础',
-    description: 'Matplotlib绘图、SciPy科学计算基础',
-    difficulty: 'beginner',
-    category: '基础练习',
-    topics: ['Matplotlib', 'SciPy', '可视化'],
-    codeTemplate: `import matplotlib.pyplot as plt
-import numpy as np
-
-# 1. 绘制简单曲线
-x = np.linspace(0, 10, 100)
-y = np.sin(x)
-
-# TODO: 绘制y=sin(x)曲线，添加标题、标签
-
-# 2. 绘制散点图
-# TODO: 生成随机数据并绘制散点图
-
-# 3. 绘制热力图
-# TODO: 使用pcolor/imshow绘制二维数据`
-  },
-  {
-    id: 'L1.3',
-    title: 'PyTorch基础',
-    description: 'Tensor操作、自动微分、GPU加速',
-    difficulty: 'beginner',
-    category: '基础练习',
-    topics: ['Tensor', 'autograd', 'CUDA'],
-    codeTemplate: `import torch
-
-# 1. 创建Tensor
-x = torch.arange(10)
-y = torch.tensor([[1, 2], [3, 4]], dtype=torch.float32)
-
-# 2. Tensor操作
-# TODO: 完成reshape, transpose等操作
-
-# 3. 自动微分
-x = torch.tensor([2.0], requires_grad=True)
-y = x ** 2
-# TODO: 计算dy/dx`
-  },
-  {
-    id: 'L1.4',
-    title: 'NumPy进阶练习',
-    description: '高级数组操作、广播机制、性能优化',
-    difficulty: 'intermediate',
-    category: '基础练习',
-    topics: ['广播', '向量化', '性能优化'],
-    codeTemplate: `import numpy as np
-
-# 1. 广播机制
-a = np.array([1, 2, 3])
-b = np.array([[1], [2], [3]])
-# TODO: 理解广播结果
-
-# 2. 向量化操作
-# 避免使用for循环，使用向量化操作
-
-# 3. 性能对比
-import time
-# TODO: 对比向量和循环的性能差异`
-  },
-  // 海洋数据处理
   {
     id: 'L2.1',
     title: 'NumPy地转差分',
-    description: '使用NumPy实现海洋地转流的差分计算',
+    description: '（内容暂不开放）',
     difficulty: 'intermediate',
     category: '海洋数据处理',
     topics: ['地转流', '差分', '海洋物理'],
-    codeTemplate: `import numpy as np
-
-# 地转流公式：
-# u = -g/f * ∂η/∂y
-# v = g/f * ∂η/∂x
-
-# 参数
-g = 9.8  # 重力加速度
-f = 1e-4  # 科氏参数
-
-# 海表高度数据（示例）
-eta = np.random.randn(100, 100)
-
-# TODO: 使用numpy差分计算地转流u, v
-# 提示：使用np.diff或卷积实现差分`
+    hidden: true
   },
   // 神经网络基础
   {
     id: 'L3.1',
     title: '线性模型及其优化',
-    description: '线性回归、代价函数、梯度下降算法实现',
+    description: '（内容暂不开放）',
     difficulty: 'intermediate',
     category: '神经网络基础',
     topics: ['线性回归', '梯度下降', '代价函数'],
-    codeTemplate: `import numpy as np
-
-# 生成数据
-np.random.seed(42)
-X = np.random.randn(100, 1)
-y = 2 * X + 1 + 0.1 * np.random.randn(100, 1)
-
-# 初始化参数
-theta = np.zeros((2, 1))  # [theta0, theta1]
-
-# TODO: 实现梯度下降算法
-# 1. 定义代价函数
-# 2. 计算梯度
-# 3. 更新参数
-# 4. 迭代优化`
+    hidden: true
   },
   {
     id: 'L4.1',
     title: '手搓NN模型及其优化',
-    description: '从零实现神经网络，包括前向传播和反向传播',
+    description: '（内容暂不开放）',
     difficulty: 'advanced',
     category: '神经网络基础',
     topics: ['前向传播', '反向传播', '激活函数'],
-    codeTemplate: `import numpy as np
-
-class NeuralNetwork:
-    def __init__(self, input_size, hidden_size, output_size):
-        # 初始化权重和偏置
-        self.W1 = np.random.randn(hidden_size, input_size) * 0.01
-        self.b1 = np.zeros((hidden_size, 1))
-        self.W2 = np.random.randn(output_size, hidden_size) * 0.01
-        self.b2 = np.zeros((output_size, 1))
-    
-    def sigmoid(self, x):
-        return 1 / (1 + np.exp(-x))
-    
-    def forward(self, X):
-        # TODO: 实现前向传播
-        pass
-    
-    def backward(self, X, y, output):
-        # TODO: 实现反向传播
-        pass`
+    hidden: true
   },
   {
     id: 'L4.2',
     title: '手搓NN模型 - 向量化',
-    description: '神经网络向量优化版本，提升计算效率',
+    description: '（内容暂不开放）',
     difficulty: 'advanced',
     category: '神经网络基础',
     topics: ['向量化', '矩阵运算', '性能优化'],
-    codeTemplate: `# 向量化版本的神经网络
-import numpy as np
-
-# 对比循环版本和向量化版本的性能
-# 使用矩阵运算替代for循环
-
-# TODO: 将向量化操作应用到前向传播和反向传播`
+    hidden: true
   },
   // PyTorch实践
   {
     id: 'L4.1-PyTorch',
     title: 'NN模型用PyTorch',
-    description: '使用PyTorch实现相同的神经网络模型',
+    description: '（内容暂不开放）',
     difficulty: 'intermediate',
     category: 'PyTorch实践',
     topics: ['nn.Module', '优化器', '训练循环'],
-    codeTemplate: `import torch
-import torch.nn as nn
-import torch.optim as optim
-
-class SimpleNN(nn.Module):
-    def __init__(self, input_size, hidden_size, output_size):
-        super(SimpleNN, self).__init__()
-        # TODO: 定义网络层
-        
-    def forward(self, x):
-        # TODO: 实现前向传播
-        pass
-
-# 实例化模型、定义损失函数和优化器
-# 编写训练循环`
+    hidden: true
   },
   {
     id: 'L5.1',
     title: 'PyTorch基础练习',
-    description: 'PyTorch核心功能练习，DataLoader使用',
+    description: '（内容暂不开放）',
     difficulty: 'intermediate',
     category: 'PyTorch实践',
     topics: ['DataLoader', 'Dataset', '批量训练'],
-    codeTemplate: `import torch
-from torch.utils.data import Dataset, DataLoader, TensorDataset
-
-# 1. 创建TensorDataset
-X = torch.randn(1000, 10)
-y = torch.randn(1000, 1)
-dataset = TensorDataset(X, y)
-
-# 2. 创建DataLoader
-# TODO: 设置batch_size和shuffle
-
-# 3. 迭代训练
-# TODO: 编写训练循环`
+    hidden: true
   },
   {
     id: 'L5.2',
     title: 'PyTorch进阶练习',
-    description: '高级PyTorch特性，模型保存加载',
+    description: '（内容暂不开放）',
     difficulty: 'intermediate',
     category: 'PyTorch实践',
     topics: ['模型保存', 'GPU训练', '学习率调度'],
-    codeTemplate: `import torch
-
-# 1. 模型保存和加载
-# torch.save(model.state_dict(), 'model.pth')
-# model.load_state_dict(torch.load('model.pth'))
-
-# 2. GPU训练
-# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-# model = model.to(device)
-
-# 3. 学习率调度
-# scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)`
+    hidden: true
   },
   // 深度学习应用
   {
     id: 'LeNet',
     title: 'LeNet手写字体识别',
-    description: '实现LeNet-5网络，MNIST数据集分类',
+    description: '（内容暂不开放）',
     difficulty: 'advanced',
     category: '深度学习应用',
     topics: ['CNN', 'LeNet', 'MNIST', '分类'],
-    codeTemplate: `import torch.nn as nn
-import torch.nn.functional as F
-
-class LeNet(nn.Module):
-    def __init__(self):
-        super(LeNet, self).__init__()
-        # TODO: 定义卷积层和全连接层
-        # Conv1: 1->6 channels, kernel=5
-        # Pool1: 2x2
-        # Conv2: 6->16 channels, kernel=5
-        # Pool2: 2x2
-        # FC layers
-        
-    def forward(self, x):
-        # TODO: 实现前向传播
-        pass`
+    hidden: true
   },
   // 新增：U-Net练习
   {
     id: 'L7.1',
     title: 'U-Net海洋数据重建',
-    description: '使用U-Net网络进行海洋热含量(OHC)重建',
+    description: '（内容暂不开放）',
     difficulty: 'advanced',
     category: '深度学习应用',
     topics: ['U-Net', 'OHC重建', '深海遥感'],
-    codeTemplate: `import torch.nn as nn
-
-class SimpleUNet(nn.Module):
-    def __init__(self):
-        super(SimpleUNet, self).__init__()
-        # Encoder (下采样)
-        self.down1 = nn.Sequential(
-            nn.Conv2d(3, 2, 3, padding=1),
-            nn.ReLU(),
-        )
-        self.pool = nn.MaxPool2d(2)
-        
-        # TODO: 完成down2, down3
-        
-        # Decoder (上采样)
-        # TODO: 定义up2, up1
-        
-        # Skip connection处理
-        # TODO: 定义skip connection后的卷积
-        
-    def forward(self, x):
-        # Encoder
-        x1 = self.down1(x)
-        # TODO: 完成encoder
-        
-        # Decoder with skip connections
-        # TODO: 完成decoder
-        
-        return output`
+    hidden: true
   },
   // 新增：LSTM练习
   {
     id: 'L8.1',
     title: 'LSTM径流预测',
-    description: '使用LSTM进行时间序列预测，预测未来径流',
+    description: '（内容暂不开放）',
     difficulty: 'advanced',
     category: '深度学习应用',
     topics: ['LSTM', '时间序列', '预测'],
-    codeTemplate: `import torch.nn as nn
-
-class LSTM(nn.Module):
-    def __init__(self, input_size, hidden_size, num_layers, output_size):
-        super(LSTM, self).__init__()
-        self.hidden_size = hidden_size
-        self.num_layers = num_layers
-        
-        # TODO: 定义LSTM层
-        self.lstm = nn.LSTM(...)
-        
-        # TODO: 定义输出层
-        self.fc = nn.Linear(...)
-        
-    def forward(self, x):
-        # TODO: 初始化h0, c0
-        # TODO: LSTM前向传播
-        # TODO: 全连接输出
-        pass`
+    hidden: true
   },
   // 新增：PINN练习
   {
     id: 'L11.1',
     title: 'PINN求解热传导方程',
-    description: '使用物理信息神经网络求解一维热传导方程',
+    description: '（内容暂不开放）',
     difficulty: 'advanced',
     category: '深度学习应用',
     topics: ['PINN', 'PDE', '物理约束'],
-    codeTemplate: `import torch
-import torch.nn as nn
-
-class PINN(nn.Module):
-    def __init__(self):
-        super(PINN, self).__init__()
-        # 定义神经网络层
-        self.net = nn.Sequential(
-            nn.Linear(2, 50),  # 输入: (t, x)
-            nn.Sigmoid(),
-            nn.Linear(50, 50),
-            nn.Sigmoid(),
-            nn.Linear(50, 1),  # 输出: T
-        )
-        
-    def forward(self, t, x):
-        inputs = torch.cat([t, x], dim=1)
-        return self.net(inputs)
-    
-    def physics_loss(self, t, x):
-        # TODO: 计算物理方程残差
-        # 热传导方程: dT/dt = alpha * d2T/dx2
-        pass
-
-# TODO: 定义训练循环，同时优化数据损失和物理损失`
+    hidden: true
   }
 ];

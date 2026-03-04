@@ -2,17 +2,18 @@ import { Waves, Mail, MapPin, ExternalLink } from 'lucide-react';
 
 const quickLinks = [
   { label: '课程介绍', href: '#about' },
-  { label: '课程大纲', href: '#syllabus' },
+  // { label: '课程大纲', href: '#syllabus' },
   { label: '编程练习', href: '#labs' },
-  { label: '课程资源', href: '#resources' },
+  // { label: '课程资源', href: '#resources' },
 ];
 
-const resources = [
-  { label: '课件下载', href: '#resources' },
-  { label: '代码示例', href: '#resources' },
-  { label: '参考资料', href: '#resources' },
-  { label: '数据平台', href: '#resources' },
-];
+// 课程资源区块已隐去，需要时取消下方注释并在 JSX 中使用 resources
+// const resources = [
+//   { label: '课件下载', href: '#resources' },
+//   { label: '代码示例', href: '#resources' },
+//   { label: '参考资料', href: '#resources' },
+//   { label: '数据平台', href: '#resources' },
+// ];
 
 export function Footer() {
   const scrollToSection = (href: string) => {
@@ -74,8 +75,8 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Resources */}
-          <div>
+          {/* 隐去 PPT/课件下载 等课程资源链接 */}
+          {/* <div>
             <h3 className="text-white font-semibold mb-4">课程资源</h3>
             <ul className="space-y-2">
               {resources.map((link) => (
@@ -93,7 +94,7 @@ export function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
         </div>
 
         {/* Bottom */}
