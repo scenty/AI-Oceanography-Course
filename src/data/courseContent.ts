@@ -82,56 +82,68 @@ export const courseChapters: Chapter[] = [
     id: 'ch2',
     title: '海洋大数据简介',
     subtitle: 'Ocean Big Data',
-    description: '大数据概况、海洋数据发展历程、数据来源与特征、常用数据平台',
+    description: '大数据概况、发展历程、定义与特征、数据来源以及常用平台',
     hours: 1,
     type: 'theory',
-    contentHidden: true,
     sections: [
       {
         id: 'ch2-1',
-        title: '大数据概况',
-        description: '在信息时代背景下，大数据成为各行各业不可忽视的重要资源。海洋大数据具有海量、多样、时变和异构的特点。',
+        title: '2.1 大数据概况',
+        description: '在信息时代背景下，大数据已成为关键生产要素。海洋大数据具有海量、多样、时变和异构的特点。',
         keyPoints: [
-          '"海洋强国"战略与"一带一路"倡议',
-          '空天地海大数据总存量达EB级，日增量达PB级',
-          '海洋大数据增速40%，超过空天和陆地数据',
-          '大数据技术：存储管理、分析挖掘、可视化'
+          '国家“海洋强国”战略推动海洋数据基础能力建设',
+          '海洋数据体量持续增长，正从“小数据”走向“大数据”',
+          '观测网络、遥感技术与算力进步共同驱动数据爆发',
+          '海洋大数据核心链路：采集、管理、分析挖掘与可视化'
         ],
         image: getImagePath('/images/big-data.png')
       },
       {
         id: 'ch2-2',
-        title: '海洋数据的发展历程',
-        description: '现代海洋科学经历三个发展阶段：科学牵引阶段、技术驱动阶段、数据主导阶段。',
+        title: '2.2 海洋大数据发展历程',
+        description: '海洋数据发展经历“初步积累—进一步积累—大量积累”三个阶段，并推动现代海洋科学从技术驱动逐步迈向数据主导。',
         keyPoints: [
-          '初步积累阶段（20世纪初）：海洋探测器、测量船',
-          '进一步积累阶段（20世纪中）：浮标、遥感卫星、Argo',
-          '大量积累阶段（21世纪）：传感器普及、云计算应用',
-          '现代物理海洋学之父：Ekman、Rossby、Sverdrup、Stommel、Munk'
+          '20世纪初：以海洋探测器与测量船为主，数据获取能力有限',
+          '20世纪中后期：浮标与卫星遥感快速发展，观测范围显著扩大',
+          '21世纪以来：Argo与多源传感器网络推动海量数据累积',
+          '从科学牵引到数据主导，海洋研究范式发生结构性变化'
         ],
         image: getImagePath('/images/ocean-data-history.png')
       },
       {
         id: 'ch2-3',
-        title: '海洋大数据的5V特征',
-        description: '海洋大数据具有Volume（海量性）、Velocity（速度）、Variety（多样性）、Veracity（真实性）、Value（价值）五大特征。',
+        title: '2.3 海洋大数据定义与5V特征',
+        description: '海洋大数据是海洋环境、生态、气候、地质与人类活动等多领域产生的海量数据集合，具有典型的5V特征。',
         keyPoints: [
-          'Volume：全球观测网络持续扩充数据量',
-          'Velocity：传感器精度提高，采集速度加快',
-          'Variety：水文、气象、地质、生物等多领域数据',
-          'Value：海洋资源利用、环境保护、灾害预测'
+          'Volume（海量性）：全球观测网络持续扩展，数据规模快速增加',
+          'Velocity（速度）：采集频率提升，实时与准实时处理需求增强',
+          'Variety（多样性）：水文、气象、地质、生物等多模态异构数据并存',
+          'Veracity（真实性）：质量控制决定数据可信度，降低噪声与误差影响',
+          'Value（价值性）：数据挖掘支撑资源利用、风险预警与决策优化'
         ],
         image: getImagePath('/images/5v-characteristics.png')
       },
       {
         id: 'ch2-4',
-        title: '常用海洋大数据平台',
-        description: '介绍国内外主要的海洋数据获取平台和资源。',
+        title: '2.4 海洋大数据来源',
+        description: '海洋大数据主要来源于实测、遥感和模式模拟三类数据体系。三者互补融合，构成现代海洋数据基础。',
         keyPoints: [
-          'Copernicus Marine Service：欧盟最大地球观测计划',
-          'NDBC：美国国家数据浮标中心',
-          '日本气象厅平台',
-          '国家海洋科学数据中心、科学数据银行'
+          '实测数据：来自船舶、浮标、潜标等平台，精度高但覆盖受限',
+          '遥感数据：覆盖范围广、更新快，适合大尺度连续观测',
+          '模式数据：通过数值模拟补足空时缺测，支撑预测分析',
+          '融合应用：多源协同提升海洋状态认知与业务化能力'
+        ],
+        image: getImagePath('/images/data-sources.png')
+      },
+      {
+        id: 'ch2-5',
+        title: '2.5 常用海洋大数据平台',
+        description: '介绍课程中常用的国内外海洋数据平台，为后续数据下载、处理与科研实践提供入口。',
+        keyPoints: [
+          'Copernicus Marine Service：全球海洋产品丰富，支持在线检索与下载',
+          'NDBC：提供海洋浮标与海气要素历史与实时观测数据',
+          '日本气象厅平台：整合气象与海洋业务化数据产品',
+          '国内平台：国家海洋科学数据中心等提供本土化数据资源'
         ],
         image: getImagePath('/images/data-platforms.png')
       }
@@ -141,32 +153,31 @@ export const courseChapters: Chapter[] = [
     id: 'ch3',
     title: '神经网络基础',
     subtitle: 'Neural Networks',
-    description: '机器学习基础、梯度下降算法、神经网络结构与反向传播',
+    description: '机器学习基础、线性回归与代价函数、梯度下降、神经网络结构、激活函数与反向传播',
     hours: 6,
     type: 'theory',
-    contentHidden: true,
     sections: [
       {
         id: 'ch3-1',
         title: '机器学习基础',
-        description: '机器学习是达到人工智能的途径，使机器在没有明确编程的情况下进行"学习"。',
+        description: '机器学习是实现人工智能的重要途径，让模型在没有显式规则编程的情况下，从数据中学习规律并提升表现。',
         keyPoints: [
-          '监督学习：提供正确训练样本，包括回归和分类',
-          '非监督学习：没有具体训练样本，包括聚类',
-          '半监督/自监督学习、生成对抗网络',
-          '机器学习基本流程：训练→验证→测试'
+          '监督学习：基于已标注样本，典型任务包括回归与分类',
+          '非监督学习：无标签数据中发现结构，典型任务包括聚类',
+          '半监督/自监督学习：结合少量标签与大量无标签数据提升效果',
+          '基本流程：训练（Training）→ 验证（Validation）→ 测试/推理（Testing/Inference）'
         ],
-        image: getImagePath('/images/machine-learning.png')
+        image: getImagePath('/images/ch3-ml-workflow.png')
       },
       {
         id: 'ch3-2',
         title: '线性回归与代价函数',
-        description: '以海洋热含量(OHC)和海表温度(SST)的线性关系为例，介绍回归问题的基本方法。',
+        description: '以海洋热含量（OHC）与海表温度（SST）的关系为例，介绍回归建模与代价函数的基本思想。',
         keyPoints: [
           '模型：OHC = θ₀ + θ₁ × SST',
-          '代价函数：均方误差 J(θ)',
-          '目标：寻找使J最小化的参数θ',
-          '参数空间与变量空间的概念'
+          '代价函数：均方误差 MSE，对应 J(θ)',
+          '优化目标：寻找使 J 最小的参数组合 θ',
+          '参数空间中最优点对应变量空间中的最优拟合关系'
         ],
         codeExample: `# 线性回归模型
 import numpy as np
@@ -184,17 +195,18 @@ ohc_pred = theta0 + theta1 * sst
 
 # 代价函数（均方误差）
 def cost_function(y_true, y_pred):
-    return np.mean((y_true - y_pred) ** 2)`
+    return np.mean((y_true - y_pred) ** 2)`,
+        image: getImagePath('/images/ch3-linear-regression.png')
       },
       {
         id: 'ch3-3',
         title: '梯度下降算法',
-        description: '梯度下降是优化神经网络的核心算法，通过迭代更新参数使代价函数最小化。',
+        description: '梯度下降是模型优化的核心方法，通过沿着负梯度方向迭代更新参数，使代价函数逐步减小。',
         keyPoints: [
-          '学习率α的选择：太小收敛慢，太大可能发散',
-          '同步更新 vs 异步更新',
-          '梯度下降能收敛到局部最小值',
-          '接近最优时自动减小步长'
+          '学习率 α 影响收敛速度与稳定性：过小收敛慢，过大可能震荡或发散',
+          '参数更新应采用同步更新，避免异步更新引入偏差',
+          '复杂损失面中可能收敛到局部极小点',
+          '接近最优区域时，梯度变小，更新步长会自然减小'
         ],
         codeExample: `# 梯度下降算法
 def gradient_descent(X, y, theta, alpha, iterations):
@@ -210,7 +222,8 @@ def gradient_descent(X, y, theta, alpha, iterations):
         # 同步更新参数
         theta = theta - alpha * gradient
         
-    return theta`
+    return theta`,
+        image: getImagePath('/images/ch3-gradient-descent.png')
       },
       {
         id: 'ch3-4',
@@ -218,21 +231,21 @@ def gradient_descent(X, y, theta, alpha, iterations):
         description: '神经网络由输入层、隐藏层、输出层组成，通过激活函数引入非线性。',
         keyPoints: [
           '感知机(Perceptron)：神经网络的起源',
-          '神经元、输入层、隐藏层、输出层',
+          '核心结构：神经元、输入层、隐藏层、输出层',
           '深度与宽度的概念',
           '万能近似定理：神经网络能拟合任意连续函数'
         ],
-        image: getImagePath('/images/neural-network-structure.png')
+        image: getImagePath('/images/ch3-neural-network-architecture.png')
       },
       {
         id: 'ch3-5',
         title: '激活函数',
-        description: '激活函数帮助网络学习数据中的复杂模式，引入非线性是神经网络的关键。',
+        description: '激活函数为网络引入非线性表达能力，是神经网络拟合复杂模式的关键组件。',
         keyPoints: [
-          'Sigmoid：S型曲线，输出0-1',
-          'ReLU：线性整流，解决梯度消失问题',
+          'Sigmoid：S 形映射，输出范围为 0 到 1',
+          'ReLU：计算高效，在深层网络中表现稳定',
           '为什么需要非线性激活函数？',
-          'ReLU vs Sigmoid：收敛速度、计算效率'
+          '常见对比：ReLU 与 Sigmoid 在收敛速度和梯度传播上的差异'
         ],
         codeExample: `# 激活函数实现
 import numpy as np
@@ -247,17 +260,18 @@ def relu(x):
     return np.maximum(0, x)
 
 def relu_derivative(x):
-    return (x > 0).astype(float)`
+    return (x > 0).astype(float)`,
+        image: getImagePath('/images/ch3-activation-functions.png')
       },
       {
         id: 'ch3-6',
         title: '反向传播算法',
-        description: '反向传播是训练神经网络的核心算法，通过链式法则计算梯度。',
+        description: '反向传播是神经网络训练的核心步骤，利用链式法则从输出层向前逐层计算梯度并更新参数。',
         keyPoints: [
           '前向传播：计算预测值',
-          '反向传播：计算梯度',
-          '链式法则的应用',
-          '参数更新：梯度下降'
+          '反向传播：逐层求导并传递误差信号',
+          '链式法则：将复杂网络拆解为可计算的局部梯度',
+          '参数更新：结合梯度下降完成权重与偏置迭代'
         ],
         codeExample: `# 反向传播示意
 # 1. 前向传播
@@ -278,7 +292,8 @@ dW1 = delta1 @ x.T
 
 # 5. 更新参数
 W1 = W1 - alpha * dW1
-W2 = W2 - alpha * dW2`
+W2 = W2 - alpha * dW2`,
+        image: getImagePath('/images/ch3-backpropagation.png')
       }
     ]
   },

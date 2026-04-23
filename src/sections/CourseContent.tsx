@@ -4,9 +4,11 @@ import { ScrollReveal } from '@/components/ScrollReveal';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { 
   BookOpen, 
   Clock, 
+  ChevronDown,
   ChevronRight, 
   Code, 
   Lightbulb,
@@ -151,17 +153,37 @@ export function CourseContent() {
                                 </ul>
                               </div>
 
-                              {/* Code Example Preview */}
+                              {/* Code Example */}
                               {section.codeExample && (
-                                <div className="mt-4 pt-4 border-t border-slate-800">
-                                  <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
-                                    <Code className="w-3 h-3" />
-                                    <span>代码示例</span>
+                                chapter.id === 'ch3' ? (
+                                  <Collapsible className="mt-4 pt-4 border-t border-slate-800">
+                                    <CollapsibleTrigger className="w-full flex items-center justify-between rounded-lg border border-slate-700 bg-slate-900/50 px-3 py-2 text-sm text-slate-200 transition-colors hover:border-blue-500/50 hover:text-blue-300 [&[data-state=open]>svg]:rotate-180">
+                                      <span>查看代码示例</span>
+                                      <ChevronDown className="w-4 h-4 transition-transform duration-200" />
+                                    </CollapsibleTrigger>
+                                    <CollapsibleContent className="data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down overflow-hidden">
+                                      <div className="mt-3">
+                                        <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
+                                          <Code className="w-3 h-3" />
+                                          <span>代码示例</span>
+                                        </div>
+                                        <pre className="text-xs text-slate-400 bg-slate-900/50 p-3 rounded-lg overflow-x-auto">
+                                          <code>{section.codeExample}</code>
+                                        </pre>
+                                      </div>
+                                    </CollapsibleContent>
+                                  </Collapsible>
+                                ) : (
+                                  <div className="mt-4 pt-4 border-t border-slate-800">
+                                    <div className="flex items-center gap-2 text-xs text-slate-500 mb-2">
+                                      <Code className="w-3 h-3" />
+                                      <span>代码示例预览</span>
+                                    </div>
+                                    <pre className="text-xs text-slate-400 bg-slate-900/50 p-3 rounded-lg overflow-x-auto">
+                                      <code>{section.codeExample.slice(0, 200)}...</code>
+                                    </pre>
                                   </div>
-                                  <pre className="text-xs text-slate-400 bg-slate-900/50 p-3 rounded-lg overflow-x-auto">
-                                    <code>{section.codeExample.slice(0, 200)}...</code>
-                                  </pre>
-                                </div>
+                                )
                               )}
                                 </>
                               )}
