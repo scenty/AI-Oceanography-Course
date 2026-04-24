@@ -1,4 +1,4 @@
-// 课程章节详细内容 - 基于PDF课件的二级标题
+﻿// 课程章节详细内容 - 基于PDF课件的二级标题
 
 // 获取正确的图片路径（适配 GitHub Pages 子路径）
 function getImagePath(path: string): string {
@@ -1085,6 +1085,244 @@ const notebookBasicTemplate = `# AI 海洋学：课前热身编程练习 (50 Qui
 
 # 恭喜完成！`;
 
+const linearModelL31Template = `# L3.1 线性模型及其优化（Q1 + Q2）
+# 说明：本练习使用合成数据，聚焦线性模型、格点搜索与梯度下降。
+# 请在带有 # TODO: 的注释下方补全代码。
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+## 单元一：数据准备与可视化
+# 真实参数（用于生成训练样本）
+theta0_true = 0.20
+theta1_true = 0.70
+n_samples = 120
+
+# Quiz 1: 生成输入 x（范围建议在 [-1.2, 1.2]）与高斯噪声 noise
+# TODO:
+
+# Quiz 2: 构造观测 y = theta1_true * x + theta0_true + noise
+# TODO:
+
+# Quiz 3: 绘制散点图 (x, y)，并标注标题 "Synthetic dSWH vs dWS"
+# TODO:
+
+## 单元二：Q1 一参数模型 + 格点搜索
+# 模型：y_hat = theta1 * x（此处不考虑偏置）
+theta1_candidates = np.arange(-1.5, 1.5, 0.01)
+
+# Quiz 4: 用 for 循环计算每个候选 theta1 的代价 J(theta1)
+# 代价函数：J = mean((y_hat - y)^2) / 2
+# TODO:
+
+# Quiz 5: 通过 np.argmin 找到最优 theta1_loop 与最小代价 jmin_loop
+# TODO:
+
+# Quiz 6: 使用向量化方式再次计算所有候选参数的代价（不要使用 for）
+# 提示：可使用 theta1_candidates[np.newaxis, :] 与 x[:, np.newaxis]
+# TODO:
+
+# Quiz 7: 对比循环版和向量化版结果（最优 theta1 和最小 J）
+# TODO:
+
+# Quiz 8: 可视化 J-theta1 曲线，并标记最优点
+# TODO:
+
+## 单元三：Q2 二参数模型 + 梯度下降
+# 模型：y_hat = theta1 * x + theta0
+theta0 = 0.0
+theta1 = 0.0
+alpha = 0.08
+n_iters = 200
+
+theta0_hist = []
+theta1_hist = []
+J_hist = []
+
+# Quiz 9: 在迭代中补全以下步骤
+# 1) 前向计算 y_hat
+# 2) 计算代价 J
+# 3) 计算梯度 dtheta0, dtheta1
+# 4) 更新参数
+# 5) 记录历史
+# TODO:
+
+# Quiz 10: 绘制损失收敛曲线（横轴 iter，纵轴 J）
+# TODO:
+
+# Quiz 11: 绘制拟合结果（散点 + 训练后拟合直线）
+# TODO:
+
+## 单元四：结果对照与误差分析
+# Quiz 12: 使用 np.polyfit(x, y, 1) 得到对照参数 theta1_ref, theta0_ref
+# TODO:
+
+# Quiz 13: 打印梯度下降参数与 polyfit 参数，并比较差异
+# TODO:
+
+# Quiz 14: 计算两种方法的 MSE 并输出
+# TODO:
+
+# 恭喜完成 L3.1！`;
+
+const manualNnL41Template = `# L4.1 手搓 NN（主线：3 节点 + 挑战：10 节点）
+# 浏览器可运行版本：仅依赖 NumPy / Matplotlib（不依赖 netCDF4 与外部 Data 文件）
+# 请在 # TODO: 处补全代码
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+## 单元一：激活函数与合成数据（Q1 / Q2）
+# Quiz 1: 实现 Sigmoid 激活函数
+def sigmoid(x):
+    # TODO:
+    pass
+
+# Quiz 2: 实现 ReLU 激活函数
+def relu(x):
+    # TODO:
+    pass
+
+# 合成数据：y = 0.55 * x + 0.22 + noise
+n_samples = 180
+x_all = np.linspace(-1.2, 1.2, n_samples)
+noise = np.random.normal(0, 0.06, size=n_samples)
+y_all = 0.55 * x_all + 0.22 + noise
+
+# mapminmax 到 [0, 1]，便于 sigmoid 输出拟合
+y_min, y_max = y_all.min(), y_all.max()
+y_all = (y_all - y_min) / (y_max - y_min)
+
+# 划分训练 / 测试
+X, Y = x_all[40:], y_all[40:]
+X_test, Y_test = x_all[:40], y_all[:40]
+
+## 单元二：3 节点网络前向传播（Q3）
+# 网络结构：输入 1 -> 隐藏层 3 -> 输出 1
+w1 = np.random.randn(3) * 0.5
+b1 = np.random.randn(3) * 0.1
+w2 = np.random.randn(3) * 0.5
+b2 = np.random.randn() * 0.1
+
+# Quiz 3: 实现前向传播
+# 提示：z1 = w1 * x + b1，g1 = sigmoid(z1)，z2 = dot(w2, g1) + b2，yhat = sigmoid(z2)
+def forward_propagation(x, w1, b1, w2, b2):
+    # TODO:
+    pass
+
+## 单元三：逐样本反向传播与参数更新（Q4）
+alpha = 0.12
+epochs = 600
+loss_hist = []
+
+# Quiz 4: 完成训练循环
+# 1) 逐样本前向传播
+# 2) 计算 MSE 并记录每轮平均损失
+# 3) 反向传播并更新 w1 / b1 / w2 / b2
+# 4) 每隔若干 epoch 打印损失
+for epoch in range(epochs):
+    # TODO:
+    pass
+
+## 单元四：训练曲线与拟合效果
+# Quiz 5: 绘制训练损失曲线（建议 semilogy）
+# TODO:
+
+# Quiz 6: 绘制训练集/测试集散点与模型拟合曲线
+# TODO:
+
+## 单元五：10 节点挑战题（可选）
+# Challenge: 将隐藏层从 3 节点改为 10 节点
+# 1) 调整参数维度
+# 2) 复用前向/反向流程
+# 3) 对比收敛速度与拟合表现
+# TODO:
+
+# 恭喜完成 L4.1！`;
+
+const vectorizedNnL42Template = `# L4.2 手搓 NN 进阶（向量化版）
+# 目标：在 L4.1 的基础上，把“逐样本循环”升级为“批量向量化计算”
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+
+## 单元一：先看 L4.1 -> L4.2 的迁移差异
+# 差异 1：输入从单个 x 变为批量 X_batch
+# 差异 2：前向传播输出从标量变为向量/矩阵
+# 差异 3：梯度从逐样本累加改为一次 batch 计算
+# 差异 4：训练速度更快，代码更贴近深度学习框架
+
+# 保持与 L4.1 一致的数据
+n_samples = 180
+x_all = np.linspace(-1.2, 1.2, n_samples)
+noise = np.random.normal(0, 0.06, size=n_samples)
+y_all = 0.55 * x_all + 0.22 + noise
+
+y_min, y_max = y_all.min(), y_all.max()
+y_all = (y_all - y_min) / (y_max - y_min)
+
+X, Y = x_all[40:], y_all[40:]
+X_test, Y_test = x_all[:40], y_all[:40]
+
+# 初始化参数（隐藏层 3 节点）
+w1 = np.random.randn(3) * 0.5
+b1 = np.random.randn(3) * 0.1
+w2 = np.random.randn(3) * 0.5
+b2 = np.random.randn() * 0.1
+
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+## 单元二：批量前向传播与批量梯度（完整模板）
+# Quiz 1: 实现批量前向传播
+# X_batch shape: (N,)
+# z1 shape: (N, 3)
+# g1 shape: (N, 3)
+# z2 shape: (N,)
+# yhat shape: (N,)
+def forward_batch(X_batch, w1, b1, w2, b2):
+    # TODO:
+    pass
+
+# Quiz 2: 实现批量反向传播
+# 目标：J = mean((yhat - y_true)^2)
+# 可用链式法则：
+# dJ/dyhat = 2*(yhat-y)/N
+# dyhat/dz2 = yhat*(1-yhat)
+# z2 = g1 @ w2 + b2
+# z1 = X[:,None]*w1[None,:] + b1[None,:]
+def backward_batch(X_batch, y_true, yhat, z1, g1, w2):
+    # TODO:
+    # return dw1, db1, dw2, db2
+    pass
+
+## 单元三：向量化训练、收敛曲线与效果对照
+alpha = 0.12
+epochs = 600
+loss_hist = []
+
+# Quiz 3: 完成向量化训练循环，并记录每个 epoch 的损失
+for epoch in range(epochs):
+    # TODO:
+    pass
+
+# Quiz 4: 绘制损失曲线，并与 L4.1 结果做定性对照
+# TODO:
+
+# Quiz 5: 可视化训练集/测试集 + 模型预测曲线
+# TODO:
+
+# Quiz 6: 输出测试集 MSE，并和 L4.1 对比
+# TODO:
+
+# 恭喜完成 L4.2！`;
+
 export const labExercises: LabExercise[] = [
   // 基础练习（对应 Student_Notebook.ipynb 课前热身 50 Quizzes）
   {
@@ -1110,35 +1348,60 @@ export const labExercises: LabExercise[] = [
     difficulty: 'intermediate',
     category: '海洋数据处理',
     topics: ['地转流', '差分', '海洋物理'],
-    hidden: true
   },
   // 神经网络基础
   {
     id: 'L3.1',
     title: '线性模型及其优化',
-    description: '（内容暂不开放）',
+    description: '基于合成海洋数据完成 Q1 格点搜索与 Q2 梯度下降，掌握代价函数最小化与参数优化流程。',
     difficulty: 'intermediate',
     category: '神经网络基础',
     topics: ['线性回归', '梯度下降', '代价函数'],
-    hidden: true
+    codeTemplate: linearModelL31Template,
+    hints: [
+      '先执行单元一，确保 x 与 y 已生成，再进入 Q1/Q2 优化步骤',
+      'Q1 代价函数建议统一写成 J = np.mean((y_hat - y) ** 2) / 2，便于循环版和向量化版对照',
+      '向量化计算时，注意维度扩展：x[:, np.newaxis] 与 theta_candidates[np.newaxis, :]',
+      'Q2 梯度下降常用梯度：dtheta1 = mean((y_hat - y) * x)，dtheta0 = mean(y_hat - y)',
+      '学习率 alpha 过大会震荡，过小会收敛慢，可在 0.02~0.1 区间尝试',
+      '结果对照可用 np.polyfit(x, y, 1)；返回顺序是 slope(theta1), intercept(theta0)',
+      '建议同时观察损失曲线与拟合直线，确认“数值收敛”和“拟合效果”一致'
+    ],
   },
   {
     id: 'L4.1',
-    title: '手搓NN模型及其优化',
-    description: '（内容暂不开放）',
+    title: '手搓NN基础练习',
+    description: '完成 3 节点手搓神经网络的前向与反向传播，并在挑战题中扩展到 10 节点结构。',
     difficulty: 'advanced',
     category: '神经网络基础',
-    topics: ['前向传播', '反向传播', '激活函数'],
-    hidden: true
+    topics: ['反向传播', '梯度下降', '非线性拟合'],
+    codeTemplate: manualNnL41Template,
+    hints: [
+      '先把 Sigmoid/ReLU 单独测通，再接入前向传播，定位问题会更快。',
+      'L4.1 主线固定为 3 节点隐藏层，确保你先跑通主线再做挑战题。',
+      '若输出层使用 sigmoid，建议将 y 做 mapminmax 到 [0,1] 再训练。',
+      '反向传播可先按“输出层 -> 隐藏层”顺序手推公式，再写代码。',
+      '每隔若干 epoch 打印一次 MSE，并用 semilogy 看收敛趋势。',
+      '10 节点挑战建议只改参数维度，不重写训练主逻辑。',
+      '对比 3 节点与 10 节点时，重点观察欠拟合/过拟合与收敛速度。'
+    ],
   },
   {
     id: 'L4.2',
-    title: '手搓NN模型 - 向量化',
-    description: '（内容暂不开放）',
+    title: '手搓NN进阶 - 向量化',
+    description: '在 L4.1 基础上完成批量向量化前向与反向传播，实现更高效的训练流程。',
     difficulty: 'advanced',
     category: '神经网络基础',
-    topics: ['向量化', '矩阵运算', '性能优化'],
-    hidden: true
+    topics: ['向量化', '批量梯度下降', '性能优化'],
+    codeTemplate: vectorizedNnL42Template,
+    hints: [
+      '先明确每个张量的 shape，再下手写向量化公式，能避免大部分 bug。',
+      '隐藏层可用 `X[:, None]` 与参数广播，得到 z1 的 `(N, hidden)` 结构。',
+      '向量化本质是把逐样本梯度求和，改成一次 Batch GD 计算。',
+      '建议先写 forward_batch 并验证输出，再实现 backward_batch。',
+      '与 L4.1 对照时，保持相同 epoch 与学习率，便于公平比较。',
+      '若训练不稳定，优先检查 alpha 和梯度维度是否匹配。'
+    ],
   },
   // PyTorch实践
   {
@@ -1209,3 +1472,4 @@ export const labExercises: LabExercise[] = [
     hidden: true
   }
 ];
+

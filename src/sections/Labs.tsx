@@ -35,6 +35,14 @@ const categories = [
 
 export function Labs() {
   const [expandedLab, setExpandedLab] = useState<string | null>(null);
+  const notebookByLabId: Record<string, string> = {
+    L1: 'Student_Notebook.ipynb',
+    'L3.1': 'L3_1_LinearModel.ipynb',
+    'L4.1': 'L4_1_ManualNN.ipynb',
+    'L4.2': 'L4_2_VectorizedNN.ipynb',
+  };
+  const activeNotebookFile = expandedLab ? notebookByLabId[expandedLab] ?? null : null;
+  const showNotebookForLab = (labId: string) => Boolean(notebookByLabId[labId]);
 
   return (
     <section id="labs" className="relative py-24 bg-[#020617]">
@@ -189,12 +197,12 @@ export function Labs() {
                                             </div>
                                           )}
 
-                                          {lab.id === 'L1' && (
+                                          {showNotebookForLab(lab.id) && (
                                             <p className="mt-3 text-xs text-cyan-400/90">
                                               下方已嵌入 JupyterLite，可直接在浏览器中运行练习。也可
                                               <a
-                                                href={`${import.meta.env.BASE_URL}notebook/Student_Notebook.ipynb`}
-                                                download="Student_Notebook.ipynb"
+                                                href={`${import.meta.env.BASE_URL}notebook/${notebookByLabId[lab.id]}`}
+                                                download={notebookByLabId[lab.id]}
                                                 className="underline hover:text-cyan-300"
                                               >
                                                 下载练习 Notebook
@@ -204,10 +212,10 @@ export function Labs() {
                                           )}
 
                                           <div className="mt-4 flex flex-wrap gap-2">
-                                            {lab.id === 'L1' && (
+                                            {showNotebookForLab(lab.id) && (
                                               <a
-                                                href={`${import.meta.env.BASE_URL}notebook/Student_Notebook.ipynb`}
-                                                download="Student_Notebook.ipynb"
+                                                href={`${import.meta.env.BASE_URL}notebook/${notebookByLabId[lab.id]}`}
+                                                download={notebookByLabId[lab.id]}
                                                 className="flex items-center gap-2 px-4 py-2 bg-slate-800 text-slate-300 rounded-lg text-sm hover:bg-slate-700 transition-colors no-underline"
                                               >
                                                 <FileCode className="w-4 h-4" />
@@ -235,8 +243,8 @@ export function Labs() {
                       ))}
                     </div>
 
-                    {/* 基础练习：L1 展开时全宽嵌入 JupyterLite */}
-                    {category.id === '基础练习' && expandedLab === 'L1' && (
+                    {/* 支持 Notebook 的练习展开时，全宽嵌入 JupyterLite */}
+                    {activeNotebookFile && (
                       <motion.div
                         initial={{ opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -260,8 +268,8 @@ export function Labs() {
                         </div>
                         <p className="text-xs text-slate-500">
                           {import.meta.env.DEV
-                            ? '本地开发使用官方 Demo；部署后将使用本站自建 JupyterLite，Notebook 已预置在左侧文件树 files 中，打开 Student_Notebook.ipynb 即可练习，无需上传。'
-                            : '首次加载会下载 Python 运行环境（约数十秒）。Notebook 已预置在左侧文件树中，打开 files → Student_Notebook.ipynb 即可直接练习，无需上传。'}
+                            ? `本地开发使用官方 Demo；部署后将使用本站自建 JupyterLite，Notebook 已预置在左侧文件树 files 中，打开 ${activeNotebookFile} 即可练习，无需上传。`
+                            : `首次加载会下载 Python 运行环境（约数十秒）。Notebook 已预置在左侧文件树中，打开 files → ${activeNotebookFile} 即可直接练习，无需上传。`}
                         </p>
                       </motion.div>
                     )}
