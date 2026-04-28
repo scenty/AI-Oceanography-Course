@@ -104,10 +104,19 @@ export function Hero() {
             size="lg"
             variant="outline"
             className="border-slate-600 text-slate-300 hover:bg-white/5 hover:text-white px-8 py-6 text-lg rounded-xl transition-all"
-            onClick={() => scrollToSection('#syllabus')}
+            asChild
           >
-            <Code className="w-5 h-5 mr-2" />
-            查看课程大纲
+            <a
+              href={encodeURI(
+                "/files/24年课程教学大纲-卢文芳-人工智能海洋学.docx",
+              )}
+              target="_blank"
+              rel="noreferrer"
+              download
+            >
+              <Code className="w-5 h-5 mr-2" />
+              查看课程大纲
+            </a>
           </Button>
         </motion.div>
       </div>
