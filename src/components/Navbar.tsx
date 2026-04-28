@@ -8,7 +8,7 @@ const navItems = [
   { label: '课程介绍', href: '#about' },
   { label: '课程内容', href: '#course-content' },
   { label: '编程练习', href: '#labs' },
-  { label: '课程资源', href: '#resources' },
+  { label: '外部授课', href: '#external-teaching' },
 ];
 
 export function Navbar() {

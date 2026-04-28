@@ -4,7 +4,7 @@ const quickLinks = [
   { label: '课程介绍', href: '#about' },
   // { label: '课程大纲', href: '#syllabus' },
   { label: '编程练习', href: '#labs' },
-  // { label: '课程资源', href: '#resources' },
+  { label: '外部授课', href: '#external-teaching' },
 ];
 
 // 课程资源区块已隐去，需要时取消下方注释并在 JSX 中使用 resources

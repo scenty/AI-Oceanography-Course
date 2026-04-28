@@ -3,6 +3,7 @@ import { Hero } from '@/sections/Hero';
 import { About } from '@/sections/About';
 import { CourseContent } from '@/sections/CourseContent';
 import { Labs } from '@/sections/Labs';
+import { ExternalTeaching } from '@/sections/ExternalTeaching';
 import { Instructor } from '@/sections/Instructor';
 import { Footer } from '@/sections/Footer';
 
@@ -18,8 +19,7 @@ function App() {
         <About />
         <CourseContent />
         <Labs />
-        {/* 隐去 PPT/课件下载 资源区块，仅保留 Ch1 时可不展示 */}
-        {/* <Resources /> */}
+        <ExternalTeaching />
         <Instructor />
       </main>
       
