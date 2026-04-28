@@ -1,10 +1,16 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, BookOpen, Code } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getImagePath } from '@/lib/utils';
 import { ParticleBackground } from '@/components/ParticleBackground';
+import { useMemo, useState } from 'react';
 
-export function Hero() {
+type Heart = { id: string; x: number; y: number };
+
+export function Hero({ onLike }: { onLike?: () => void }) {
+  const [hearts, setHearts] = useState<Heart[]>([]);
+  const idPrefix = useMemo(() => Math.random().toString(36).slice(2), []);
+
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
@@ -16,6 +22,22 @@ export function Hero() {
     <section
       id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      onClick={(e) => {
+        const target = e.target as HTMLElement | null;
+        if (target && (target.closest('a') || target.closest('button'))) return;
+
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const id = `${idPrefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+        setHearts((prev) => [...prev, { id, x, y }]);
+        onLike?.();
+
+        window.setTimeout(() => {
+          setHearts((prev) => prev.filter((h) => h.id !== id));
+        }, 900);
+      }}
     >
       {/* Background Image */}
       <div
@@ -34,6 +56,33 @@ export function Hero() {
       {/* Particle Background - 放在 Hero 内部以确保正确的堆叠顺序 */}
       <div className="absolute inset-0 z-[5] overflow-hidden">
         <ParticleBackground />
+      </div>
+
+      {/* Click Hearts */}
+      <div className="absolute inset-0 z-[8] pointer-events-none">
+        <AnimatePresence>
+          {hearts.map((h) => (
+            <motion.div
+              key={h.id}
+              initial={{ opacity: 0, scale: 0.6, y: 0 }}
+              animate={{ opacity: 1, scale: 1.1, y: -46 }}
+              exit={{ opacity: 0, scale: 0.9, y: -70 }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute select-none"
+              style={{ left: h.x, top: h.y, transform: 'translate(-50%, -50%)' }}
+            >
+              <span
+                className="text-2xl sm:text-3xl"
+                style={{
+                  color: '#ef4444',
+                  textShadow: '0 8px 24px rgba(239, 68, 68, 0.45)',
+                }}
+              >
+                ♥
+              </span>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
 
       {/* Content */}

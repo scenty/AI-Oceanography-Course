@@ -15,7 +15,7 @@ const quickLinks = [
 //   { label: '数据平台', href: '#resources' },
 // ];
 
-export function Footer() {
+export function Footer({ likes }: { likes?: number }) {
   const scrollToSection = (href: string) => {
     const element = document.querySelector(href);
     if (element) {
@@ -101,6 +101,9 @@ export function Footer() {
         <div className="mt-16 pt-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-slate-500 text-sm">
             © 2025 中山大学 人工智能海洋学课程. All rights reserved.
+          </p>
+          <p className="text-slate-500 text-sm">
+            点赞数：<span className="text-slate-300 font-medium">{likes ?? 0}</span>
           </p>
           <div className="flex items-center gap-4">
             <a

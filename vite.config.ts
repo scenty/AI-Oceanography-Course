@@ -7,7 +7,12 @@ import { inspectAttr } from 'kimi-plugin-inspect-react'
 export default defineConfig(({ mode }) => ({
   // 如果使用 GitHub Pages 子路径，请将 '/AI-Oceanography-Course/' 改为 '/您的仓库名/'
   // 如果使用自定义域名，请改为 '/'
-  base: mode === 'production' ? '/AI-Oceanography-Course/' : './',
+  base: mode === 'production' ? '/AI-Oceanography-Course/' : '/',
+  server: {
+    host: '127.0.0.1',
+    port: 5173,
+    strictPort: true,
+  },
   plugins: [inspectAttr(), react()],
   resolve: {
     alias: {
