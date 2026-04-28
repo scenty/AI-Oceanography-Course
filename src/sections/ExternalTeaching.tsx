@@ -34,20 +34,20 @@ const activities: TeachingActivity[] = [
     outline: {
       title: '培训大纲（DOCX）',
       desc: '授课安排与内容纲要',
-      href: '/external-teaching/training-outline.docx',
+      href: 'external-teaching/training-outline.docx',
     },
     ppt: {
       title: '课件（PDF）',
       desc: '授课PPT导出版，共55页',
-      href: '/files/Lu-AIO5授课.pdf',
+      href: 'files/Lu-AIO5授课.pdf',
     },
     photos: [
-      { src: '/external-teaching/photos/aio5-1.png', alt: '论坛授课照片 1' },
-      { src: '/external-teaching/photos/aio5-2.png', alt: '论坛授课照片 2' },
-      { src: '/external-teaching/photos/aio5-3.png', alt: '论坛授课照片 3' },
-      { src: '/external-teaching/photos/aio5-4.png', alt: '论坛授课照片 4' },
-      { src: '/external-teaching/photos/aio5-5.png', alt: '论坛授课照片 5' },
-      { src: '/external-teaching/photos/aio5-6.png', alt: '论坛授课照片 6' },
+      { src: 'external-teaching/photos/aio5-1.png', alt: '论坛授课照片 1' },
+      { src: 'external-teaching/photos/aio5-2.png', alt: '论坛授课照片 2' },
+      { src: 'external-teaching/photos/aio5-3.png', alt: '论坛授课照片 3' },
+      { src: 'external-teaching/photos/aio5-4.png', alt: '论坛授课照片 4' },
+      { src: 'external-teaching/photos/aio5-5.png', alt: '论坛授课照片 5' },
+      { src: 'external-teaching/photos/aio5-6.png', alt: '论坛授课照片 6' },
     ],
   },
   {
@@ -61,11 +61,11 @@ const activities: TeachingActivity[] = [
     ppt: {
       title: '课件（PDF）',
       desc: 'MARINE Summer School 2025（英文版，78页）',
-      href: '/files/AIO_lecture_Lu-FIN.pdf',
+      href: 'files/AIO_lecture_Lu-FIN.pdf',
     },
     photos: [
-      { src: '/external-teaching/photos/marine-2025-1.png', alt: 'MARINE Summer School 授课合影' },
-      { src: '/external-teaching/photos/marine-2025-2.png', alt: 'MARINE Summer School 授课现场' },
+      { src: 'external-teaching/photos/marine-2025-1.png', alt: 'MARINE Summer School 授课合影' },
+      { src: 'external-teaching/photos/marine-2025-2.png', alt: 'MARINE Summer School 授课现场' },
     ],
   },
   {
@@ -80,6 +80,12 @@ const activities: TeachingActivity[] = [
   },
 ];
 
+function withBase(pathname: string) {
+  const base = import.meta.env.BASE_URL;
+  const cleaned = pathname.startsWith('/') ? pathname.slice(1) : pathname;
+  return `${base}${cleaned}`;
+}
+
 function FileRow({ file }: { file: TeachingFile }) {
   return (
     <div className="flex items-center justify-between gap-4 p-4 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors">
@@ -88,7 +94,7 @@ function FileRow({ file }: { file: TeachingFile }) {
         <div className="text-slate-500 text-sm truncate">{file.desc}</div>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
-        <a href={file.href} target="_blank" rel="noopener noreferrer">
+        <a href={withBase(file.href)} target="_blank" rel="noopener noreferrer">
           <Button
             variant="secondary"
             className="bg-blue-500/10 text-blue-300 border border-blue-500/20 hover:bg-blue-500/20"
@@ -96,7 +102,7 @@ function FileRow({ file }: { file: TeachingFile }) {
             打开
           </Button>
         </a>
-        <a href={file.href} download>
+        <a href={withBase(file.href)} download>
           <Button
             variant="secondary"
             className="bg-slate-900/40 text-slate-200 border border-slate-700 hover:bg-slate-900/60"
@@ -225,13 +231,13 @@ export function ExternalTeaching() {
                                 {(a.photos || []).map((p) => (
                                   <a
                                     key={p.src}
-                                    href={p.src}
+                                    href={withBase(p.src)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="group relative overflow-hidden rounded-lg border border-slate-800 bg-slate-900/40"
                                   >
                                     <img
-                                      src={p.src}
+                                      src={withBase(p.src)}
                                       alt={p.alt}
                                       className="w-full h-32 sm:h-36 md:h-40 object-cover transition-transform duration-500 group-hover:scale-105"
                                       loading="lazy"

@@ -44,6 +44,28 @@ type Chapter = {
   items: LabItem[];
 };
 
+function withBase(pathname: string) {
+  const base = import.meta.env.BASE_URL;
+  const cleaned = pathname.startsWith('/') ? pathname.slice(1) : pathname;
+  return `${base}${cleaned}`;
+}
+
+function getJupyterLiteUrl(notebook?: string) {
+  const base = import.meta.env.BASE_URL;
+  const theme = 'JupyterLab%20Dark';
+
+  if (import.meta.env.DEV) {
+    // 本地开发用官方 Demo（不预置文件）
+    return `https://jupyterlite.github.io/demo/lab/index.html?theme=${theme}`;
+  }
+
+  // 生产：使用本站构建产物 public/jupyterlite（CI 里构建并随 dist 发布）
+  // 注意：notebook 文件会被 jupyter lite build --contents public/notebook 预置到文件系统根目录（通常在 files/ 下可见）
+  // path 参数：打开时定位到某个文件（如果不支持，会退回到文件树手动打开）
+  const pathParam = notebook ? `&path=${encodeURIComponent(notebook)}` : '';
+  return `${base}jupyterlite/lab/index.html?theme=${theme}${pathParam}`;
+}
+
 const chapters: Chapter[] = [
   {
     id: 'Coding1',
@@ -62,7 +84,7 @@ const chapters: Chapter[] = [
           { label: '练习代码（.py）', href: '/coding/coding1/Code1.0 - 基本操作.py', kind: 'py' },
           { label: '练习 Notebook（.ipynb）', href: '/notebook/Student_Notebook.ipynb', kind: 'ipynb' },
         ],
-        note: '在线运行：先下载 Notebook，再在下方 JupyterLite 里 File → Open 打开。',
+        note: '在线运行：部署站点可直接打开预置 Notebook；本地开发环境可能需要手动打开/上传。',
       },
       {
         id: 'Code1.1',
@@ -367,7 +389,7 @@ export function Labs() {
                                           {lab.materials.map((m) => (
                                             <a
                                               key={m.href}
-                                              href={`${import.meta.env.BASE_URL}${m.href.startsWith('/') ? m.href.slice(1) : m.href}`}
+                                              href={withBase(m.href)}
                                               download={m.kind === 'ipynb' ? (lab.notebook ?? undefined) : undefined}
                                               className="flex items-center justify-between gap-3 px-4 py-3 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors no-underline"
                                               onClick={(e) => e.stopPropagation()}
@@ -384,8 +406,10 @@ export function Labs() {
 
                                       {lab.notebook && (
                                         <p className="mt-3 text-xs text-cyan-400/90">
-                                          下方已嵌入 JupyterLite（官方在线环境），建议先下载本练习的 Notebook，再在 JupyterLite 中
-                                          通过 File → Open 打开运行。
+                                          下方已嵌入 JupyterLite：
+                                          {import.meta.env.DEV
+                                            ? '本地开发使用官方 Demo；请在 JupyterLite 中 File → Open 打开（或上传）Notebook。'
+                                            : '部署站点已预置 Notebook，打开后即可直接运行，无需上传。'}
                                         </p>
                                       )}
 
@@ -402,7 +426,7 @@ export function Labs() {
                                           </a>
                                         )}
                                         <a
-                                          href="https://jupyterlite.github.io/demo/lab/index.html?theme=JupyterLab%20Dark"
+                                          href={getJupyterLiteUrl(lab.notebook)}
                                           target="_blank"
                                           rel="noopener noreferrer"
                                           onClick={(e) => e.stopPropagation()}
@@ -432,12 +456,12 @@ export function Labs() {
                       >
                         <div className="flex items-center gap-2 text-sm text-cyan-400">
                           <Play className="w-4 h-4 flex-shrink-0" />
-                          <span>在线运行（JupyterLite 官方 Demo，可在浏览器内执行 Python / Notebook）</span>
+                          <span>在线运行（JupyterLite：部署站点预置 Notebook，无需上传）</span>
                         </div>
                         <div className="rounded-xl overflow-hidden border border-slate-700 bg-slate-900/50">
                           <iframe
                             title="JupyterLite 在线 Notebook"
-                            src="https://jupyterlite.github.io/demo/lab/index.html?theme=JupyterLab%20Dark"
+                            src={getJupyterLiteUrl(activeItem.notebook)}
                             className="w-full border-0"
                             style={{ height: 'min(72vh, 680px)' }}
                             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-modals"
@@ -445,7 +469,10 @@ export function Labs() {
                           />
                         </div>
                         <p className="text-xs text-slate-500">
-                          首次加载会下载 Python 运行环境（约数十秒）。请先下载本练习 Notebook，然后在左侧菜单 File → Open 打开运行。
+                          首次加载会下载 Python 运行环境（约数十秒）。
+                          {import.meta.env.DEV
+                            ? '本地开发环境使用官方 Demo：需要在 File → Open 打开（或上传）Notebook。'
+                            : '部署站点已预置 Notebook：打开后即可直接运行，无需上传。'}
                         </p>
                       </motion.div>
                     )}
