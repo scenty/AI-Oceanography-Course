@@ -44,6 +44,11 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          VITE_GH_OWNER: ${{ github.repository_owner }}
+          VITE_GH_REPO: ${{ github.event.repository.name }}
+          VITE_GH_BRANCH: ${{ github.ref_name }}
+          VITE_LIKES_API_URL: ${{ secrets.VITE_LIKES_API_URL }}
         run: npm run build
 
       - name: Setup Pages

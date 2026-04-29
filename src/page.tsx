@@ -7,21 +7,55 @@ import { ExternalTeaching } from '@/sections/ExternalTeaching';
 import { Instructor } from '@/sections/Instructor';
 import { Footer } from '@/sections/Footer';
 import { useEffect, useState } from 'react';
+import {
+  getLikesApiPostUrl,
+  getLikesJsonRawUrl,
+  readLikesLocalStorage,
+  writeLikesLocalStorage,
+} from '@/lib/likesRemote';
 
 function App() {
   const [likes, setLikes] = useState(0);
 
   useEffect(() => {
-    const raw = window.localStorage.getItem('aio_likes');
-    const n = raw ? Number(raw) : 0;
-    setLikes(Number.isFinite(n) ? n : 0);
+    setLikes(readLikesLocalStorage());
+    const rawUrl = getLikesJsonRawUrl();
+    if (!rawUrl) return;
+    const bust = `?t=${Date.now()}`;
+    fetch(`${rawUrl}${bust}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!data || typeof data.count !== 'number') return;
+        const c = Math.max(0, Math.floor(data.count));
+        setLikes(c);
+        writeLikesLocalStorage(c);
+      });
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem('aio_likes', String(likes));
+    writeLikesLocalStorage(likes);
   }, [likes]);
 
-  const addLike = () => setLikes((v) => v + 1);
+  const addLike = () => {
+    setLikes((v) => v + 1);
+    const postUrl = getLikesApiPostUrl();
+    if (!postUrl) return;
+    fetch(postUrl, { method: 'POST' })
+      .then((r) => {
+        if (!r.ok) {
+          setLikes((v) => Math.max(0, v - 1));
+          return null;
+        }
+        return r.json();
+      })
+      .then((data) => {
+        if (data && typeof data.count === 'number') {
+          const c = Math.max(0, Math.floor(data.count));
+          setLikes(c);
+          writeLikesLocalStorage(c);
+        }
+      });
+  };
 
   return (
     <div className="relative min-h-screen bg-[#020617]">
