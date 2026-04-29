@@ -49,6 +49,8 @@ jobs:
           VITE_GH_REPO: ${{ github.event.repository.name }}
           VITE_GH_BRANCH: ${{ github.ref_name }}
           VITE_LIKES_API_URL: ${{ secrets.VITE_LIKES_API_URL }}
+          VITE_UPSTASH_REDIS_REST_URL: ${{ secrets.VITE_UPSTASH_REDIS_REST_URL }}
+          VITE_UPSTASH_REDIS_REST_TOKEN: ${{ secrets.VITE_UPSTASH_REDIS_REST_TOKEN }}
         run: npm run build
 
       - name: Setup Pages

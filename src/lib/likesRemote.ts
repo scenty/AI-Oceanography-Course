@@ -1,24 +1,72 @@
 /**
- * 点赞持久化到 GitHub 仓库中的 public/likes.json：
- * - 读取：公开 raw 地址，无需 token（公开仓库）。
- * - 写入：需部署 api/like.mjs（如 Vercel），并配置 VITE_LIKES_API_URL 指向该 POST 接口；
- *   服务端使用 LIKES_GITHUB_PAT（contents:write）等变量，见 api/like.mjs 顶部注释。
+ * 点赞持久化：通过 Upstash Redis REST API 实现跨用户/跨设备的真正计数。
+ *
+ * 配置方式（本地开发）：
+ *   在项目根目录创建 .env.local，写入：
+ *   VITE_UPSTASH_REDIS_REST_URL=https://<id>.upstash.io
+ *   VITE_UPSTASH_REDIS_REST_TOKEN=<token>
+ *
+ * 配置方式（GitHub Actions）：
+ *   在仓库 Settings > Secrets and variables > Actions > Repository secrets 中添加：
+ *   VITE_UPSTASH_REDIS_REST_URL
+ *   VITE_UPSTASH_REDIS_REST_TOKEN
+ *
+ * 如果没有配置 Upstash，则回退到 localStorage（仅本机有效）。
  */
 
 const LS_KEY = 'aio_likes';
+const LS_LIKED_AT = 'aio_liked_at';
 
-export function getLikesJsonRawUrl(): string | null {
-  const owner = import.meta.env.VITE_GH_OWNER?.trim();
-  const repo = import.meta.env.VITE_GH_REPO?.trim();
-  const branch = (import.meta.env.VITE_GH_BRANCH?.trim() || 'main');
-  if (!owner || !repo) return null;
-  return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/public/likes.json`;
+interface UpstashConfig {
+  url: string;
+  token: string;
 }
 
-/** POST 的完整 URL，例如 https://xxx.vercel.app/api/like */
-export function getLikesApiPostUrl(): string | null {
-  const u = import.meta.env.VITE_LIKES_API_URL?.trim();
-  return u || null;
+export function getUpstashConfig(): UpstashConfig | null {
+  const url = import.meta.env.VITE_UPSTASH_REDIS_REST_URL?.trim();
+  const token = import.meta.env.VITE_UPSTASH_REDIS_REST_TOKEN?.trim();
+  if (!url || !token) return null;
+  return { url, token };
+}
+
+/** 从 Upstash Redis 读取当前点赞总数；失败时回退到 localStorage */
+export async function fetchRemoteLikes(): Promise<number> {
+  const cfg = getUpstashConfig();
+  if (!cfg) return readLikesLocalStorage();
+
+  try {
+    const res = await fetch(`${cfg.url}/get/likes`, {
+      headers: { Authorization: `Bearer ${cfg.token}` },
+    });
+    if (!res.ok) throw new Error(`status ${res.status}`);
+    const data = (await res.json()) as { result: string | number | null };
+    const count = data.result == null ? 0 : Number(data.result);
+    const safeCount = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
+    writeLikesLocalStorage(safeCount);
+    return safeCount;
+  } catch {
+    return readLikesLocalStorage();
+  }
+}
+
+/** 调用 Upstash Redis INCR 使点赞数 +1；返回新的总数，失败返回 null */
+export async function incrementRemoteLikes(): Promise<number | null> {
+  const cfg = getUpstashConfig();
+  if (!cfg) return null;
+
+  try {
+    const res = await fetch(`${cfg.url}/incr/likes`, {
+      headers: { Authorization: `Bearer ${cfg.token}` },
+    });
+    if (!res.ok) throw new Error(`status ${res.status}`);
+    const data = (await res.json()) as { result: string | number | null };
+    const count = data.result == null ? 0 : Number(data.result);
+    const safeCount = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
+    writeLikesLocalStorage(safeCount);
+    return safeCount;
+  } catch {
+    return null;
+  }
 }
 
 export function readLikesLocalStorage(): number {
@@ -29,4 +77,17 @@ export function readLikesLocalStorage(): number {
 
 export function writeLikesLocalStorage(n: number) {
   window.localStorage.setItem(LS_KEY, String(Math.max(0, Math.floor(n))));
+}
+
+/** 检查用户最近 24 小时内是否已经点过赞（用于前端防重复） */
+export function hasLikedRecently(): boolean {
+  const raw = window.localStorage.getItem(LS_LIKED_AT);
+  if (!raw) return false;
+  const likedAt = Number(raw);
+  if (!Number.isFinite(likedAt)) return false;
+  return Date.now() - likedAt < 24 * 60 * 60 * 1000;
+}
+
+export function markLiked() {
+  window.localStorage.setItem(LS_LIKED_AT, String(Date.now()));
 }

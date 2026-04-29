@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, BookOpen, Code } from 'lucide-react';
+import { ChevronDown, BookOpen, Code, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { getImagePath } from '@/lib/utils';
 import { ParticleBackground } from '@/components/ParticleBackground';
@@ -7,7 +7,15 @@ import { useMemo, useState } from 'react';
 
 type Heart = { id: string; x: number; y: number };
 
-export function Hero({ onLike }: { onLike?: () => void }) {
+export function Hero({
+  onLike,
+  likes,
+  hasLiked,
+}: {
+  onLike?: () => void;
+  likes?: number;
+  hasLiked?: boolean;
+}) {
   const [hearts, setHearts] = useState<Heart[]>([]);
   const idPrefix = useMemo(() => Math.random().toString(36).slice(2), []);
 
@@ -32,7 +40,9 @@ export function Hero({ onLike }: { onLike?: () => void }) {
         const id = `${idPrefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
         setHearts((prev) => [...prev, { id, x, y }]);
-        onLike?.();
+        if (!hasLiked) {
+          onLike?.();
+        }
 
         window.setTimeout(() => {
           setHearts((prev) => prev.filter((h) => h.id !== id));
@@ -167,6 +177,35 @@ export function Hero({ onLike }: { onLike?: () => void }) {
               查看课程大纲
             </a>
           </Button>
+        </motion.div>
+
+        {/* 点赞按钮 */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8, ease: [0.165, 0.84, 0.44, 1] }}
+          className="mt-6"
+        >
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (!hasLiked) onLike?.();
+            }}
+            disabled={hasLiked}
+            className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium transition-all ${
+              hasLiked
+                ? 'bg-red-500/20 text-red-400 cursor-default'
+                : 'bg-white/5 text-slate-300 hover:bg-red-500/20 hover:text-red-400 hover:scale-105'
+            }`}
+            title={hasLiked ? '今天已经点过赞啦，明天再来吧～' : '点击点赞'}
+          >
+            <Heart
+              className={`w-4 h-4 transition-colors ${
+                hasLiked ? 'fill-red-400 text-red-400' : ''
+              }`}
+            />
+            <span>已获赞 {likes ?? 0}</span>
+          </button>
         </motion.div>
       </div>
 

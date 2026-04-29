@@ -8,70 +8,51 @@ import { Instructor } from '@/sections/Instructor';
 import { Footer } from '@/sections/Footer';
 import { useEffect, useState } from 'react';
 import {
-  getLikesApiPostUrl,
-  getLikesJsonRawUrl,
-  readLikesLocalStorage,
-  writeLikesLocalStorage,
+  fetchRemoteLikes,
+  incrementRemoteLikes,
+  hasLikedRecently,
+  markLiked,
 } from '@/lib/likesRemote';
 
 function App() {
   const [likes, setLikes] = useState(0);
+  const [hasLiked, setHasLiked] = useState(false);
 
   useEffect(() => {
-    setLikes(readLikesLocalStorage());
-    const rawUrl = getLikesJsonRawUrl();
-    if (!rawUrl) return;
-    const bust = `?t=${Date.now()}`;
-    fetch(`${rawUrl}${bust}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (!data || typeof data.count !== 'number') return;
-        const c = Math.max(0, Math.floor(data.count));
-        setLikes(c);
-        writeLikesLocalStorage(c);
-      });
+    setHasLiked(hasLikedRecently());
+    fetchRemoteLikes().then((count) => setLikes(count));
   }, []);
 
-  useEffect(() => {
-    writeLikesLocalStorage(likes);
-  }, [likes]);
+  const addLike = async () => {
+    if (hasLiked) return;
 
-  const addLike = () => {
+    // 乐观更新 UI
     setLikes((v) => v + 1);
-    const postUrl = getLikesApiPostUrl();
-    if (!postUrl) return;
-    fetch(postUrl, { method: 'POST' })
-      .then((r) => {
-        if (!r.ok) {
-          setLikes((v) => Math.max(0, v - 1));
-          return null;
-        }
-        return r.json();
-      })
-      .then((data) => {
-        if (data && typeof data.count === 'number') {
-          const c = Math.max(0, Math.floor(data.count));
-          setLikes(c);
-          writeLikesLocalStorage(c);
-        }
-      });
+    setHasLiked(true);
+    markLiked();
+
+    // 远程同步（真正跨用户持久化）
+    const newCount = await incrementRemoteLikes();
+    if (newCount !== null) {
+      setLikes(newCount);
+    }
   };
 
   return (
     <div className="relative min-h-screen bg-[#020617]">
       {/* Navigation */}
       <Navbar />
-      
+
       {/* Main Content */}
       <main className="relative z-10">
-        <Hero onLike={addLike} />
+        <Hero onLike={addLike} likes={likes} hasLiked={hasLiked} />
         <About />
         <CourseContent />
         <Labs />
         <ExternalTeaching />
         <Instructor />
       </main>
-      
+
       {/* Footer */}
       <Footer likes={likes} />
     </div>
