@@ -12,6 +12,8 @@ import {
   incrementRemoteLikes,
   hasLikedRecently,
   markLiked,
+  clearLiked,
+  readLikesLocalStorage,
 } from '@/lib/likesRemote';
 
 function App() {
@@ -20,22 +22,27 @@ function App() {
 
   useEffect(() => {
     setHasLiked(hasLikedRecently());
+    setLikes(readLikesLocalStorage());
     fetchRemoteLikes().then((count) => setLikes(count));
   }, []);
 
   const addLike = async () => {
     if (hasLiked) return;
 
-    // 乐观更新 UI
     setLikes((v) => v + 1);
     setHasLiked(true);
     markLiked();
 
-    // 远程同步（真正跨用户持久化）
     const newCount = await incrementRemoteLikes();
     if (newCount !== null) {
       setLikes(newCount);
+      return;
     }
+
+    // 远程写入失败：回滚乐观更新，允许用户重试
+    setLikes((v) => Math.max(0, v - 1));
+    setHasLiked(false);
+    clearLiked();
   };
 
   return (

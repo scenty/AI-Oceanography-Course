@@ -1,72 +1,93 @@
 /**
- * 点赞持久化：通过 Upstash Redis REST API 实现跨用户/跨设备的真正计数。
+ * 点赞持久化到 GitHub 仓库中的 public/likes.json：
+ * - 读取：优先走 Vercel Edge GET（VITE_LIKES_API_URL）；否则用公开 raw 地址。
+ * - 写入：仅通过 VITE_LIKES_API_URL 指向的 POST（api/like.mjs），
+ *   PAT 等密钥只存在于 Vercel 服务端，不会打进前端包。
  *
- * 配置方式（本地开发）：
- *   在项目根目录创建 .env.local，写入：
- *   VITE_UPSTASH_REDIS_REST_URL=https://<id>.upstash.io
- *   VITE_UPSTASH_REDIS_REST_TOKEN=<token>
- *
- * 配置方式（GitHub Actions）：
- *   在仓库 Settings > Secrets and variables > Actions > Repository secrets 中添加：
- *   VITE_UPSTASH_REDIS_REST_URL
- *   VITE_UPSTASH_REDIS_REST_TOKEN
- *
- * 如果没有配置 Upstash，则回退到 localStorage（仅本机有效）。
+ * GitHub Actions 需配置 Secret：VITE_LIKES_API_URL
+ * Vercel 需配置：LIKES_GITHUB_PAT、LIKES_GH_OWNER、LIKES_GH_REPO
+ * （可选：LIKES_GH_BRANCH、LIKES_JSON_PATH）
  */
 
 const LS_KEY = 'aio_likes';
 const LS_LIKED_AT = 'aio_liked_at';
 
-interface UpstashConfig {
-  url: string;
-  token: string;
+/** POST/GET 的完整 URL，例如 https://xxx.vercel.app/api/like */
+export function getLikesApiUrl(): string | null {
+  const u = import.meta.env.VITE_LIKES_API_URL?.trim();
+  return u || null;
 }
 
-export function getUpstashConfig(): UpstashConfig | null {
-  const url = import.meta.env.VITE_UPSTASH_REDIS_REST_URL?.trim();
-  const token = import.meta.env.VITE_UPSTASH_REDIS_REST_TOKEN?.trim();
-  if (!url || !token) return null;
-  return { url, token };
+export function getLikesJsonRawUrl(): string | null {
+  const owner = import.meta.env.VITE_GH_OWNER?.trim();
+  const repo = import.meta.env.VITE_GH_REPO?.trim();
+  const branch = import.meta.env.VITE_GH_BRANCH?.trim() || 'main';
+  if (!owner || !repo) return null;
+  return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/public/likes.json`;
 }
 
-/** 从 Upstash Redis 读取当前点赞总数；失败时回退到 localStorage */
+function parseCount(value: unknown): number | null {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return null;
+  return Math.max(0, Math.floor(n));
+}
+
+async function fetchCountFromUrl(url: string, init?: RequestInit): Promise<number | null> {
+  return fetch(url, init)
+    .then(async (res) => {
+      if (!res.ok) return null;
+      const data = (await res.json()) as { count?: unknown };
+      return parseCount(data.count);
+    })
+    .catch(() => null);
+}
+
+/** 读取远程点赞总数；失败时回退到 localStorage */
 export async function fetchRemoteLikes(): Promise<number> {
-  const cfg = getUpstashConfig();
-  if (!cfg) return readLikesLocalStorage();
-
-  try {
-    const res = await fetch(`${cfg.url}/get/likes`, {
-      headers: { Authorization: `Bearer ${cfg.token}` },
-    });
-    if (!res.ok) throw new Error(`status ${res.status}`);
-    const data = (await res.json()) as { result: string | number | null };
-    const count = data.result == null ? 0 : Number(data.result);
-    const safeCount = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
-    writeLikesLocalStorage(safeCount);
-    return safeCount;
-  } catch {
-    return readLikesLocalStorage();
+  const apiUrl = getLikesApiUrl();
+  if (apiUrl) {
+    const fromApi = await fetchCountFromUrl(apiUrl, { method: 'GET' });
+    if (fromApi !== null) {
+      writeLikesLocalStorage(fromApi);
+      return fromApi;
+    }
   }
+
+  const rawUrl = getLikesJsonRawUrl();
+  if (rawUrl) {
+    const fromRaw = await fetchCountFromUrl(`${rawUrl}?t=${Date.now()}`);
+    if (fromRaw !== null) {
+      writeLikesLocalStorage(fromRaw);
+      return fromRaw;
+    }
+  }
+
+  return readLikesLocalStorage();
 }
 
-/** 调用 Upstash Redis INCR 使点赞数 +1；返回新的总数，失败返回 null */
+/**
+ * 远程点赞 +1。
+ * - 已配置 API：POST 成功返回服务端总数，失败返回 null
+ * - 未配置 API：仅更新 localStorage 并返回本地值（无法跨设备）
+ */
 export async function incrementRemoteLikes(): Promise<number | null> {
-  const cfg = getUpstashConfig();
-  if (!cfg) return null;
-
-  try {
-    const res = await fetch(`${cfg.url}/incr/likes`, {
-      headers: { Authorization: `Bearer ${cfg.token}` },
-    });
-    if (!res.ok) throw new Error(`status ${res.status}`);
-    const data = (await res.json()) as { result: string | number | null };
-    const count = data.result == null ? 0 : Number(data.result);
-    const safeCount = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
-    writeLikesLocalStorage(safeCount);
-    return safeCount;
-  } catch {
-    return null;
+  const apiUrl = getLikesApiUrl();
+  if (!apiUrl) {
+    const next = readLikesLocalStorage() + 1;
+    writeLikesLocalStorage(next);
+    return next;
   }
+
+  return fetch(apiUrl, { method: 'POST' })
+    .then(async (res) => {
+      if (!res.ok) return null;
+      const data = (await res.json()) as { count?: unknown };
+      const count = parseCount(data.count);
+      if (count === null) return null;
+      writeLikesLocalStorage(count);
+      return count;
+    })
+    .catch(() => null);
 }
 
 export function readLikesLocalStorage(): number {
@@ -79,7 +100,7 @@ export function writeLikesLocalStorage(n: number) {
   window.localStorage.setItem(LS_KEY, String(Math.max(0, Math.floor(n))));
 }
 
-/** 检查用户最近 24 小时内是否已经点过赞（用于前端防重复） */
+/** 检查用户最近 24 小时内是否已经点过赞（前端防重复） */
 export function hasLikedRecently(): boolean {
   const raw = window.localStorage.getItem(LS_LIKED_AT);
   if (!raw) return false;
@@ -90,4 +111,8 @@ export function hasLikedRecently(): boolean {
 
 export function markLiked() {
   window.localStorage.setItem(LS_LIKED_AT, String(Date.now()));
+}
+
+export function clearLiked() {
+  window.localStorage.removeItem(LS_LIKED_AT);
 }
