@@ -54,9 +54,12 @@
 AI-Oceanography-Course/
 ├── .github/workflows/deploy.yml   # GitHub Actions CI/CD：自动构建并部署到 GitHub Pages
 ├── api/
-│   └── like.mjs                   # ⚠️ 旧 Vercel Edge 点赞函数，已被 cloudflare/like-worker.js 取代（保留作参考）
+│   └── like.mjs                   # ⚠️ 旧 Vercel 点赞函数（已停用，保留作参考）
 ├── cloudflare/
-│   └── like-worker.js             # Cloudflare Worker：点赞计数器后端
+│   └── like-worker.js             # ⚠️ 旧 Cloudflare Worker（已停用，保留作参考）
+├── edge-functions/
+│   └── api/
+│       └── like.js                # EdgeOne Pages Edge Function：点赞计数器（当前使用）
 ├── public/                        # 静态资源（构建时复制到 dist）
 │   ├── images/                    # 课程配图（神经网络、CNN、Transformer 等）
 │   ├── files/                     # 教学大纲、PDF 讲义
@@ -112,7 +115,7 @@ AI-Oceanography-Course/
 | 图表 | recharts |
 | 笔记本引擎 | JupyterLite（Pyodide 内核） |
 | 部署 | GitHub Pages |
-| 点赞后端 | Cloudflare Worker |
+| 点赞后端 | 腾讯 EdgeOne Pages Edge Function |
 
 ---
 
@@ -139,9 +142,11 @@ npm run lint
 
 ## 点赞计数器说明
 
-前端只调用自有的 **Cloudflare Worker** 接口（`cloudflare/like-worker.js`），GitHub PAT 等密钥留在服务端，不会打进前端包。
+前端只调用自有的 **腾讯 EdgeOne Pages Edge Function** 接口（`edge-functions/api/like.js`），GitHub PAT 等密钥留在服务端，不会打进前端包。
 
-> 历史说明：此前使用 Vercel Edge（`api/like.mjs`），因国内网络无法稳定访问 `*.vercel.app`（`ERR_CONNECTION_TIMED_OUT`）而迁移到 Cloudflare Workers。`api/like.mjs` 保留作参考，不再使用。
+│   └── like-worker.js             # ⚠️ 旧 Cloudflare Worker（已停用，保留作参考）
+> 前两者因国内网络无法稳定访问 `*.vercel.app` / `*.workers.dev`（DNS 污染）而弃用，代码保留作参考。
+> 现网接口：`https://likes.aioceanography.top/api/like`
 
 ### 1. 创建 GitHub PAT（如已有可跳过）
 
@@ -149,55 +154,61 @@ GitHub → **Settings → Developer settings → Personal access tokens**：
 - Classic token：勾选 `repo`（含 contents 读写）
 - Fine-grained token：只授权 `AI-Oceanography-Course` 仓库，开 **Contents: Read and write**
 
-### 2. 部署 Cloudflare Worker
+### 2. 部署 EdgeOne Pages 函数
 
-#### 创建 Worker
+#### 导入仓库
 
-1. 打开 [https://dash.cloudflare.com](https://dash.cloudflare.com) 并登录（没有账号就免费注册，不需要绑定域名、不需要信用卡）
-2. 首次使用会要求设置 **workers.dev 子域**（例如 `yourname.workers.dev`），按提示确认即可
-3. 左侧菜单 → **Workers & Pages** → 点 **Create**（或 **Create Application**）→ 选 **Create Worker**
-4. 名称填 `aio-likes`（可自定义），直接点 **Deploy** —— 先用默认 Hello World 代码部署，不用管代码内容
-5. 部署成功后点 **Edit Code**（或 Worker 页面的 **Edit code** 按钮）进入在线编辑器
-6. 用仓库中 `cloudflare/like-worker.js` 的**全部内容**替换编辑器里的代码，点右上角 **Deploy**
+1. 打开 [腾讯云 EdgeOne Pages 控制台](https://console.cloud.tencent.com/edgeone/pages)（需实名认证，免费额度足够）
+2. **创建项目 → 关联 GitHub 仓库**，授权后选择 `scenty/AI-Oceanography-Course`
+3. 平台会自动识别 `edge-functions/` 目录：`edge-functions/api/like.js` → 路由 `/api/like`
 
 #### 配置环境变量
 
-Worker 页面 → **Settings** → **Variables and Secrets** → **Add**：
+项目 → **项目设置 → 环境变量**：
 
-| 变量 | 类型 | 值 |
-|------|------|-----|
-| `LIKES_GITHUB_PAT` | **Secret** | 第 1 步申请的 GitHub PAT |
-| `LIKES_GH_OWNER` | Text | `scenty` |
-| `LIKES_GH_REPO` | Text | `AI-Oceanography-Course` |
+| 变量 | 值 |
+|------|-----|
+| `LIKES_GITHUB_PAT` | 第 1 步申请的 GitHub PAT |
+| `LIKES_GH_OWNER` | `scenty` |
+| `LIKES_GH_REPO` | `AI-Oceanography-Course` |
 
 可选：`LIKES_GH_BRANCH`（默认 `main`）、`LIKES_JSON_PATH`（默认 `public/likes.json`）
 
-> 注意：`LIKES_GITHUB_PAT` 的类型务必选 **Secret**（加密存储）；添加后 Cloudflare 会自动重新部署使其生效。
+#### 绑定自定义域名（必须）
+
+⚠️ EdgeOne 默认分配的 `*.edgeone.cool` 域名**只是 3 小时有效的预览链接**（控制台"预览"按钮续期），不能用于生产。必须绑定自有域名：
+
+1. 准备一个域名（本项目用 `aioceanography.top`）
+2. 首次添加域名时按提示做**归属权验证**：在域名解析商处添加指定的 TXT 记录
+3. 项目加速区域设为 **全球可用区（不含中国大陆）**——此区域绑定自定义域名无需 ICP 备案
+4. 添加自定义域名 `likes.aioceanography.top`，按提示在解析商处加 **CNAME** 记录指向 EdgeOne 目标值
+5. 等待证书自动签发（几分钟到半小时）；签好前浏览器会报 HTTPS 隐私错误，属正常
 
 #### 验证
 
-浏览器直接打开 Worker 地址：
-
-`https://aio-likes.<你的子域>.workers.dev`
-
-应返回类似 `{"count":0,"ok":true}` 的 JSON。该完整 URL 即下一步要用的 `VITE_LIKES_API_URL`（**根路径即可，不要加 /api/like**）。
+```bash
+curl https://likes.aioceanography.top/api/like
+# 应返回 {"count":N,"ok":true}
+curl -X POST https://likes.aioceanography.top/api/like
+# count 应递增
+```
 
 排错：
-- `{"ok":false,"reason":"not_configured"}`：环境变量没配或名字打错
+- `{"ok":false,"reason":"not_configured"}`：环境变量没配或名字打错，改完需重新部署
 - `502`：PAT 权限不足、过期，或 `LIKES_GH_OWNER` / `LIKES_GH_REPO` 写错
-- 想看运行日志：Worker 页面 → **Observability** / **Logs** 可开实时日志
+- `401 UNAUTHORIZED`：访问的是 `*.edgeone.cool` 预览域名且凭证过期，应改用自定义域名
 
 ### 3. 配置前端构建
 
-在 GitHub 仓库 **Settings → Secrets and variables → Actions** 中，把已有的 `VITE_LIKES_API_URL` **修改为**：
+在 GitHub 仓库 **Settings → Secrets and variables → Actions** 中，把 `VITE_LIKES_API_URL` 设为：
 
-- `VITE_LIKES_API_URL` = `https://aio-likes.<你的子域>.workers.dev`
+- `VITE_LIKES_API_URL` = `https://likes.aioceanography.top/api/like`（注意带 `/api/like`）
 
 然后 push 到 `main` 或在 Actions 页面手动 **Re-run** 最近一次 Deploy 工作流。本地开发可复制 `.env.example` 为 `.env.local`。
 
 > 点赞写入会更新 `public/likes.json`；工作流已对它 `paths-ignore`，避免每次点赞触发整站重部署。
 
-### 4. 收尾（可选）
+### 4. 说明
 
-- Vercel 侧：确认 Cloudflare 链路可用后，可在 Vercel Dashboard 删除原项目，避免残留 PAT 暴露面
-- 本地自测 POST：`curl -X POST https://aio-likes.<你的子域>.workers.dev`，返回的 `count` 应递增（注意前端有 24h 防重复点赞，清 localStorage 的 `aio_liked_at` 可重置）
+- 前端有 24h 防重复点赞（localStorage `aio_liked_at`），清除该键可重置
+│   └── like-worker.js             # ⚠️ 旧 Cloudflare Worker（已停用，保留作参考）
