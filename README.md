@@ -54,7 +54,9 @@
 AI-Oceanography-Course/
 ├── .github/workflows/deploy.yml   # GitHub Actions CI/CD：自动构建并部署到 GitHub Pages
 ├── api/
-│   └── like.mjs                   # Vercel Edge Function：点赞计数器后端
+│   └── like.mjs                   # ⚠️ 旧 Vercel Edge 点赞函数，已被 cloudflare/like-worker.js 取代（保留作参考）
+├── cloudflare/
+│   └── like-worker.js             # Cloudflare Worker：点赞计数器后端
 ├── public/                        # 静态资源（构建时复制到 dist）
 │   ├── images/                    # 课程配图（神经网络、CNN、Transformer 等）
 │   ├── files/                     # 教学大纲、PDF 讲义
@@ -110,7 +112,7 @@ AI-Oceanography-Course/
 | 图表 | recharts |
 | 笔记本引擎 | JupyterLite（Pyodide 内核） |
 | 部署 | GitHub Pages |
-| 点赞后端 | Vercel Edge Function |
+| 点赞后端 | Cloudflare Worker |
 
 ---
 
@@ -137,65 +139,65 @@ npm run lint
 
 ## 点赞计数器说明
 
-前端只调用自有的 **Vercel Edge** 接口（`api/like.mjs`），GitHub PAT 等密钥留在服务端，不会打进前端包。
+前端只调用自有的 **Cloudflare Worker** 接口（`cloudflare/like-worker.js`），GitHub PAT 等密钥留在服务端，不会打进前端包。
 
-### 1. 部署 Vercel API
+> 历史说明：此前使用 Vercel Edge（`api/like.mjs`），因国内网络无法稳定访问 `*.vercel.app`（`ERR_CONNECTION_TIMED_OUT`）而迁移到 Cloudflare Workers。`api/like.mjs` 保留作参考，不再使用。
 
-#### 导入仓库
+### 1. 创建 GitHub PAT（如已有可跳过）
 
-1. 打开 [https://vercel.com](https://vercel.com)，用 **GitHub** 账号登录
-2. 进入 Dashboard → **Add New… → Project**
-3. 在 **Import Git Repository** 中找到 `scenty/AI-Oceanography-Course`  
-   - 若列表没有：点 **Adjust GitHub App Permissions**，授权 Vercel 访问该仓库（或整个账号）
-4. 点击 **Import**
-5. 配置页建议：
-   - **Framework Preset**：Other（或 Vite 亦可；站点本身仍由 GitHub Pages 托管）
-   - **Root Directory**：`.`（仓库根目录，不要改到子目录）
-   - **Build Command** 可留空或保持默认；我们主要用 `/api/like`，不依赖 Vercel 托管前端
-6. 先点开 **Environment Variables**，按下面填好后再 **Deploy**
+GitHub → **Settings → Developer settings → Personal access tokens**：
+- Classic token：勾选 `repo`（含 contents 读写）
+- Fine-grained token：只授权 `AI-Oceanography-Course` 仓库，开 **Contents: Read and write**
 
-#### 环境变量
+### 2. 部署 Cloudflare Worker
 
-在 Vercel 项目 **Settings → Environment Variables**（或导入时的配置页）添加：
+#### 创建 Worker
 
-| 变量 | 值 |
-|------|-----|
-| `LIKES_GITHUB_PAT` | 具有 `contents:write` 的 GitHub PAT |
-| `LIKES_GH_OWNER` | `scenty` |
-| `LIKES_GH_REPO` | `AI-Oceanography-Course` |
+1. 打开 [https://dash.cloudflare.com](https://dash.cloudflare.com) 并登录（没有账号就免费注册，不需要绑定域名、不需要信用卡）
+2. 首次使用会要求设置 **workers.dev 子域**（例如 `yourname.workers.dev`），按提示确认即可
+3. 左侧菜单 → **Workers & Pages** → 点 **Create**（或 **Create Application**）→ 选 **Create Worker**
+4. 名称填 `aio-likes`（可自定义），直接点 **Deploy** —— 先用默认 Hello World 代码部署，不用管代码内容
+5. 部署成功后点 **Edit Code**（或 Worker 页面的 **Edit code** 按钮）进入在线编辑器
+6. 用仓库中 `cloudflare/like-worker.js` 的**全部内容**替换编辑器里的代码，点右上角 **Deploy**
+
+#### 配置环境变量
+
+Worker 页面 → **Settings** → **Variables and Secrets** → **Add**：
+
+| 变量 | 类型 | 值 |
+|------|------|-----|
+| `LIKES_GITHUB_PAT` | **Secret** | 第 1 步申请的 GitHub PAT |
+| `LIKES_GH_OWNER` | Text | `scenty` |
+| `LIKES_GH_REPO` | Text | `AI-Oceanography-Course` |
 
 可选：`LIKES_GH_BRANCH`（默认 `main`）、`LIKES_JSON_PATH`（默认 `public/likes.json`）
 
+> 注意：`LIKES_GITHUB_PAT` 的类型务必选 **Secret**（加密存储）；添加后 Cloudflare 会自动重新部署使其生效。
+
 #### 验证
 
-部署成功后，浏览器打开：
+浏览器直接打开 Worker 地址：
 
-`https://<你的项目名>.vercel.app/api/like`
+`https://aio-likes.<你的子域>.workers.dev`
 
-应返回类似 `{"count":0,"ok":true}` 的 JSON。该完整 URL 即下一步要用的 `VITE_LIKES_API_URL`。
+应返回类似 `{"count":0,"ok":true}` 的 JSON。该完整 URL 即下一步要用的 `VITE_LIKES_API_URL`（**根路径即可，不要加 /api/like**）。
 
-> PAT 申请：GitHub → Settings → Developer settings → Personal access tokens。Classic token 勾选 `repo`（含 contents）；Fine-grained 则对该仓库开 Contents: Read and write。
+排错：
+- `{"ok":false,"reason":"not_configured"}`：环境变量没配或名字打错
+- `502`：PAT 权限不足、过期，或 `LIKES_GH_OWNER` / `LIKES_GH_REPO` 写错
+- 想看运行日志：Worker 页面 → **Observability** / **Logs** 可开实时日志
 
-#### 打不开 / 一直转圈时
+### 3. 配置前端构建
 
-国内网络常无法访问 `*.vercel.app`（DNS 污染或连接被重置）。可先自检：
+在 GitHub 仓库 **Settings → Secrets and variables → Actions** 中，把已有的 `VITE_LIKES_API_URL` **修改为**：
 
-1. 浏览器直接打开 `https://ai-oceanography-course.vercel.app/api/like`
-2. 同时打开 Vercel 控制台 → 项目 → **Deployments / Logs**，看函数是否有请求、是否报错
-3. 若浏览器也超时，而 Dashboard 里部署是 Ready：多半是 **访问性** 问题，不是代码没部署
-4. 返回 `{"ok":false,"reason":"not_configured"}`：环境变量未配或未勾选 Production 并 Redeploy
-5. 返回 `502`：多半是 `LIKES_GITHUB_PAT` 权限不足或仓库名写错
+- `VITE_LIKES_API_URL` = `https://aio-likes.<你的子域>.workers.dev`
 
-若日志出现 `default export returned a Response` 随后 300s 超时：说明函数签名不对。`api/like.mjs` 必须使用具名导出 `GET`/`POST`（不要 `export default` 再 `return new Response`）。改完后需 push 并 Redeploy。
-
-课程站点主要面向国内访问时，若确认 Vercel 不稳定，应改用更易访问的边缘函数（例如 Cloudflare Workers）承载 `/api/like`。
-
-### 2. 配置前端构建
-
-在 GitHub 仓库 **Settings → Secrets and variables → Actions** 添加：
-
-- `VITE_LIKES_API_URL` = 上一步的完整 URL（含 `/api/like`）
-
-然后 push 到 `main` 或手动触发 Deploy 工作流。本地开发可复制 `.env.example` 为 `.env.local`。
+然后 push 到 `main` 或在 Actions 页面手动 **Re-run** 最近一次 Deploy 工作流。本地开发可复制 `.env.example` 为 `.env.local`。
 
 > 点赞写入会更新 `public/likes.json`；工作流已对它 `paths-ignore`，避免每次点赞触发整站重部署。
+
+### 4. 收尾（可选）
+
+- Vercel 侧：确认 Cloudflare 链路可用后，可在 Vercel Dashboard 删除原项目，避免残留 PAT 暴露面
+- 本地自测 POST：`curl -X POST https://aio-likes.<你的子域>.workers.dev`，返回的 `count` 应递增（注意前端有 24h 防重复点赞，清 localStorage 的 `aio_liked_at` 可重置）

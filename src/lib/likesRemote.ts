@@ -1,18 +1,18 @@
 /**
  * 点赞持久化到 GitHub 仓库中的 public/likes.json：
- * - 读取：优先走 Vercel Edge GET（VITE_LIKES_API_URL）；否则用公开 raw 地址。
- * - 写入：仅通过 VITE_LIKES_API_URL 指向的 POST（api/like.mjs），
- *   PAT 等密钥只存在于 Vercel 服务端，不会打进前端包。
+ * - 读取：优先走 Cloudflare Worker GET（VITE_LIKES_API_URL）；否则用公开 raw 地址。
+ * - 写入：仅通过 VITE_LIKES_API_URL 指向的 POST（cloudflare/like-worker.js），
+ *   PAT 等密钥只存在于 Cloudflare 服务端，不会打进前端包。
  *
  * GitHub Actions 需配置 Secret：VITE_LIKES_API_URL
- * Vercel 需配置：LIKES_GITHUB_PAT、LIKES_GH_OWNER、LIKES_GH_REPO
+ * Cloudflare Worker 需配置：LIKES_GITHUB_PAT、LIKES_GH_OWNER、LIKES_GH_REPO
  * （可选：LIKES_GH_BRANCH、LIKES_JSON_PATH）
  */
 
 const LS_KEY = 'aio_likes';
 const LS_LIKED_AT = 'aio_liked_at';
 
-/** POST/GET 的完整 URL，例如 https://xxx.vercel.app/api/like */
+/** POST/GET 的完整 URL，例如 https://aio-likes.yourname.workers.dev */
 export function getLikesApiUrl(): string | null {
   const u = import.meta.env.VITE_LIKES_API_URL?.trim();
   return u || null;
