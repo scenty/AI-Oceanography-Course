@@ -1,0 +1,12 @@
+{
+  "buildCommand": "BASE_PATH=/ npm run build",
+  "installCommand": "npm ci",
+  "outputDirectory": "./dist",
+  "nodeVersion": "20.18.0",
+  "rewrites": [
+    {
+      "source": "/*",
+      "destination": "/index.html"
+    }
+  ]
+}
